@@ -144,8 +144,8 @@ nav{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(8,12,24,.92)
 .bullet-list li{font-size:13px;color:var(--text2);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
 .bullet-list li:last-child{border-bottom:none}
 .bullet-list li::before{content:'▸';color:var(--accent3);flex-shrink:0;margin-top:1px}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.animate-in{animation:fadeInUp .4s ease forwards}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeInUp .4s ease forwards;opacity:1}
 .stagger-1{animation-delay:.05s}.stagger-2{animation-delay:.10s}.stagger-3{animation-delay:.15s}.stagger-4{animation-delay:.20s}.stagger-5{animation-delay:.25s}.stagger-6{animation-delay:.30s}.stagger-7{animation-delay:.35s}.stagger-8{animation-delay:.40s}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--text3)}
 @media(max-width:640px){.detail-grid-2{grid-template-columns:1fr}.tdh-main{grid-template-columns:1fr}.firm-detail-header{grid-template-columns:1fr}}
@@ -184,13 +184,13 @@ nav{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(8,12,24,.92)
   <div id="main-tab-firms" style="max-width:1400px;margin:0 auto;padding:0 24px;">
     <div class="filter-bar">
       <span class="filter-label">Tier:</span>
-      <button class="filter-btn active" onclick="setFilter('tier','all',this)">All</button>
-      <button class="filter-btn" onclick="setFilter('tier','big4',this)">Big 4</button>
-      <button class="filter-btn" onclick="setFilter('tier','mid',this)">Mid-Tier</button>
+      <button class="filter-btn active" data-group="tier" onclick="setFilter('tier','all',this)">All</button>
+      <button class="filter-btn" data-group="tier" onclick="setFilter('tier','big4',this)">Big 4</button>
+      <button class="filter-btn" data-group="tier" onclick="setFilter('tier','mid',this)">Mid-Tier</button>
       <span class="filter-label" style="margin-left:12px">AI Maturity:</span>
-      <button class="filter-btn active" onclick="setFilter('ai','all',this)">All</button>
-      <button class="filter-btn" onclick="setFilter('ai','agentic',this)">Agentic AI</button>
-      <button class="filter-btn" onclick="setFilter('ai','genai',this)">GenAI</button>
+      <button class="filter-btn active" data-group="ai" onclick="setFilter('ai','all',this)">All</button>
+      <button class="filter-btn" data-group="ai" onclick="setFilter('ai','agentic',this)">Agentic AI</button>
+      <button class="filter-btn" data-group="ai" onclick="setFilter('ai','genai',this)">GenAI</button>
     </div>
     <div class="section-header"><div class="section-title">Audit Firms</div><div class="section-count" id="firm-count">8 firms</div></div>
     <div class="firm-grid" id="firm-grid"></div>
@@ -246,7 +246,9 @@ return`<span class="sep">›</span><span class="crumb">${c}</span>`;
 
 function setFilter(type,val,btn){
 filters[type]=val;
-btn.parentElement.querySelectorAll(’.filter-btn’).forEach(b=>b.classList.remove(‘active’));
+// Only reset buttons in the same filter group (matched by data-filter-group)
+const group=btn.dataset.group;
+document.querySelectorAll(`.filter-btn[data-group="${group}"]`).forEach(b=>b.classList.remove(‘active’));
 btn.classList.add(‘active’);
 renderFirmGrid();
 }
@@ -271,7 +273,7 @@ if(filters.ai===‘genai’&&f.aiLevel===‘basic’)return false;
 return true;
 });
 document.getElementById(‘firm-count’).textContent=`${firms.length} firms`;
-grid.innerHTML=firms.map((f,i)=>` <div class="firm-card animate-in stagger-${Math.min(i+1,8)}" onclick="showView('firm','${f.id}')"> <span class="firm-card-arrow">→</span> <div class="firm-card-top"> <div class="firm-logo-box" style="background:${f.color}22;color:${f.color};border:1px solid ${f.color}44">${f.logo}</div> <div class="firm-meta"> <div class="firm-name">${f.name}</div> <div class="firm-tier">${f.tier==='big4'?'◆ Big Four':'◇ Mid-Tier'} · ${f.auditors} auditors</div> </div> </div> <div class="firm-flagship"><span class="flagship-dot"></span>${f.flagship}</div> <div class="ai-bar-wrap"> <div class="ai-bar-label"><span>AI Maturity</span><span style="color:${f.aiScore>=90?'var(--accent3)':f.aiScore>=75?'var(--accent)':'var(--gold)'}">${f.aiScore}/100</span></div> <div class="ai-bar-track"><div class="ai-bar-fill" style="width:${f.aiScore}%"></div></div> </div> <div class="firm-desc">${f.desc.substring(0,160)}...</div> <div class="firm-tools-preview"> ${f.tools.slice(0,4).map(t=>`<span class="tool-tag">${t.name}</span>`).join('')} ${f.tools.length>4?`<span class="tool-tag">+${f.tools.length-4} more</span>`:''} </div> <div class="firm-metrics"> <div class="firm-metric-item"><div class="firm-metric-val" style="color:${f.color}">${f.tools.length}</div><div class="firm-metric-label">Tools</div></div> <div class="firm-metric-item"><div class="firm-metric-val">${f.countries}</div><div class="firm-metric-label">Countries</div></div> <div class="firm-metric-item"><div class="firm-metric-val" style="color:${f.aiLevel==='agentic'?'var(--green)':'var(--accent3)'}">${f.aiLevel==='agentic'?'🤖 Agentic':'✦ GenAI'}</div><div class="firm-metric-label">AI Level</div></div> </div> </div>`).join(’’);
+grid.innerHTML=firms.map((f,i)=>` <div class="firm-card" style="opacity:0;animation:fadeInUp .35s ease forwards;animation-delay:${i*40}ms" onclick="showView('firm','${f.id}')"> <span class="firm-card-arrow">→</span> <div class="firm-card-top"> <div class="firm-logo-box" style="background:${f.color}22;color:${f.color};border:1px solid ${f.color}44">${f.logo}</div> <div class="firm-meta"> <div class="firm-name">${f.name}</div> <div class="firm-tier">${f.tier==='big4'?'◆ Big Four':'◇ Mid-Tier'} · ${f.auditors} auditors</div> </div> </div> <div class="firm-flagship"><span class="flagship-dot"></span>${f.flagship}</div> <div class="ai-bar-wrap"> <div class="ai-bar-label"><span>AI Maturity</span><span style="color:${f.aiScore>=90?'var(--accent3)':f.aiScore>=75?'var(--accent)':'var(--gold)'}">${f.aiScore}/100</span></div> <div class="ai-bar-track"><div class="ai-bar-fill" style="width:${f.aiScore}%"></div></div> </div> <div class="firm-desc">${f.desc.substring(0,160)}...</div> <div class="firm-tools-preview"> ${f.tools.slice(0,4).map(t=>`<span class="tool-tag">${t.name}</span>`).join('')} ${f.tools.length>4?`<span class="tool-tag">+${f.tools.length-4} more</span>`:''} </div> <div class="firm-metrics"> <div class="firm-metric-item"><div class="firm-metric-val" style="color:${f.color}">${f.tools.length}</div><div class="firm-metric-label">Tools</div></div> <div class="firm-metric-item"><div class="firm-metric-val">${f.countries}</div><div class="firm-metric-label">Countries</div></div> <div class="firm-metric-item"><div class="firm-metric-val" style="color:${f.aiLevel==='agentic'?'var(--green)':'var(--accent3)'}">${f.aiLevel==='agentic'?'🤖 Agentic':'✦ GenAI'}</div><div class="firm-metric-label">AI Level</div></div> </div> </div>`).join(’’);
 }
 
 function renderCompareTable(){
