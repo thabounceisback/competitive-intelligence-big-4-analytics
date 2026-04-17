@@ -6,2477 +6,322 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0e1a">
 <title>AuditIntel — Competitive Analytics Intelligence</title>
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQXVkaXRJbnRlbCIsInNob3J0X25hbWUiOiJBdWRpdEludGVsIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwYTBlMWEiLCJ0aGVtZV9jb2xvciI6IiMwYTBlMWEifQ==">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #080c18;
-  --surface: #0f1628;
-  --surface2: #151d35;
-  --border: #1e2d52;
-  --border2: #253566;
-  --text: #e8eeff;
-  --text2: #8a9cc8;
-  --text3: #4f6096;
-  --accent: #3d6eff;
-  --accent2: #6f3dff;
-  --accent3: #00d4ff;
-  --gold: #f5a623;
-  --green: #00e5a0;
-  --red: #ff4d6d;
-
-/* Firm colors */
-–pwc: #d04a02;
-–ey: #ffe600;
-–kpmg: #00338d;
-–deloitte: #86bc25;
-–gt: #6e2585;
-–bdo: #e4002b;
-–rsm: #005eb8;
-–crowe: #009a44;
-}
-
-- { margin: 0; padding: 0; box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
-
-body {
-font-family: ‘Inter’, sans-serif;
-background: var(–bg);
-color: var(–text);
-min-height: 100vh;
-overflow-x: hidden;
-}
-
-/* ─── NOISE TEXTURE OVERLAY ─── */
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.03’/%3E%3C/svg%3E”);
-pointer-events: none;
-z-index: 0;
-opacity: 0.4;
-}
-
-/* ─── NAV ─── */
-nav {
-position: fixed;
-top: 0; left: 0; right: 0;
-height: 56px;
-background: rgba(8,12,24,0.92);
-backdrop-filter: blur(20px);
-border-bottom: 1px solid var(–border);
-display: flex;
-align-items: center;
-padding: 0 24px;
-gap: 20px;
-z-index: 1000;
-}
-
-.nav-logo {
-font-family: ‘Syne’, sans-serif;
-font-weight: 800;
-font-size: 17px;
-letter-spacing: -0.5px;
-color: var(–text);
-flex-shrink: 0;
-}
-.nav-logo span { color: var(–accent3); }
-
-.nav-breadcrumb {
-display: flex;
-align-items: center;
-gap: 6px;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 11px;
-color: var(–text3);
-flex: 1;
-overflow: hidden;
-}
-.nav-breadcrumb .crumb { color: var(–text2); white-space: nowrap; cursor: pointer; transition: color 0.2s; }
-.nav-breadcrumb .crumb:hover { color: var(–accent3); }
-.nav-breadcrumb .sep { color: var(–text3); }
-
-.nav-badge {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-background: rgba(61,110,255,0.15);
-border: 1px solid rgba(61,110,255,0.3);
-color: var(–accent3);
-padding: 3px 8px;
-border-radius: 3px;
-flex-shrink: 0;
-}
-
-/* ─── MAIN LAYOUT ─── */
-.app {
-padding-top: 56px;
-min-height: 100vh;
-position: relative;
-z-index: 1;
-}
-
-/* ─── VIEWS ─── */
-.view { display: none; }
-.view.active { display: block; }
-
-/* ─── HERO SECTION ─── */
-.hero {
-padding: 64px 24px 48px;
-max-width: 1400px;
-margin: 0 auto;
-}
-
-.hero-tag {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 11px;
-color: var(–accent3);
-letter-spacing: 2px;
-text-transform: uppercase;
-margin-bottom: 16px;
-}
-
-.hero h1 {
-font-family: ‘Syne’, sans-serif;
-font-weight: 800;
-font-size: clamp(32px, 5vw, 56px);
-line-height: 1.0;
-letter-spacing: -2px;
-margin-bottom: 16px;
-}
-
-.hero h1 .dim { color: var(–text3); }
-
-.hero p {
-font-size: 15px;
-color: var(–text2);
-max-width: 560px;
-line-height: 1.65;
-margin-bottom: 32px;
-}
-
-/* ─── FILTER BAR ─── */
-.filter-bar {
-display: flex;
-flex-wrap: wrap;
-gap: 8px;
-margin-bottom: 40px;
-max-width: 1400px;
-margin-left: auto;
-margin-right: auto;
-padding: 0 24px 40px;
-}
-
-.filter-group {
-display: flex;
-gap: 6px;
-align-items: center;
-}
-
-.filter-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 1px;
-margin-right: 4px;
-}
-
-.filter-btn {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 11px;
-padding: 5px 10px;
-border: 1px solid var(–border);
-background: transparent;
-color: var(–text2);
-border-radius: 3px;
-cursor: pointer;
-transition: all 0.15s;
-white-space: nowrap;
-}
-.filter-btn:hover { border-color: var(–accent); color: var(–text); }
-.filter-btn.active { background: var(–accent); border-color: var(–accent); color: #fff; }
-
-/* ─── MARKET STATS STRIP ─── */
-.stats-strip {
-max-width: 1400px;
-margin: 0 auto;
-padding: 0 24px 40px;
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-gap: 12px;
-}
-
-.stat-card {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 6px;
-padding: 16px;
-position: relative;
-overflow: hidden;
-}
-
-.stat-card::before {
-content: ‘’;
-position: absolute;
-top: 0; left: 0; right: 0;
-height: 2px;
-background: var(–accent);
-}
-
-.stat-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 1px;
-margin-bottom: 8px;
-}
-
-.stat-value {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 24px;
-letter-spacing: -1px;
-color: var(–text);
-}
-
-.stat-sub {
-font-size: 12px;
-color: var(–text3);
-margin-top: 4px;
-}
-
-/* ─── FIRM GRID ─── */
-.section-header {
-max-width: 1400px;
-margin: 0 auto;
-padding: 0 24px 20px;
-display: flex;
-align-items: baseline;
-gap: 12px;
-}
-
-.section-title {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 13px;
-letter-spacing: 2px;
-text-transform: uppercase;
-color: var(–text2);
-}
-
-.section-count {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 11px;
-color: var(–text3);
-}
-
-.firm-grid {
-max-width: 1400px;
-margin: 0 auto;
-padding: 0 24px 80px;
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-gap: 16px;
-}
-
-/* ─── FIRM CARD ─── */
-.firm-card {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 8px;
-padding: 24px;
-cursor: pointer;
-transition: all 0.2s;
-position: relative;
-overflow: hidden;
-}
-
-.firm-card::after {
-content: ‘’;
-position: absolute;
-inset: 0;
-background: radial-gradient(ellipse at 50% 0%, rgba(61,110,255,0.06) 0%, transparent 70%);
-opacity: 0;
-transition: opacity 0.3s;
-pointer-events: none;
-}
-
-.firm-card:hover {
-border-color: var(–border2);
-transform: translateY(-2px);
-box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-}
-.firm-card:hover::after { opacity: 1; }
-
-.firm-card-top {
-display: flex;
-align-items: flex-start;
-gap: 14px;
-margin-bottom: 18px;
-}
-
-.firm-logo-box {
-width: 44px;
-height: 44px;
-border-radius: 8px;
-display: flex;
-align-items: center;
-justify-content: center;
-font-family: ‘Syne’, sans-serif;
-font-weight: 800;
-font-size: 14px;
-flex-shrink: 0;
-letter-spacing: -0.5px;
-}
-
-.firm-meta { flex: 1; min-width: 0; }
-
-.firm-name {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 17px;
-letter-spacing: -0.5px;
-margin-bottom: 3px;
-}
-
-.firm-tier {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-text-transform: uppercase;
-letter-spacing: 1px;
-color: var(–text3);
-}
-
-.firm-flagship {
-display: inline-flex;
-align-items: center;
-gap: 6px;
-background: rgba(255,255,255,0.04);
-border: 1px solid var(–border);
-border-radius: 4px;
-padding: 6px 10px;
-margin-bottom: 14px;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 11px;
-color: var(–text2);
-}
-
-.flagship-dot {
-width: 6px; height: 6px;
-border-radius: 50%;
-background: var(–accent3);
-animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-0%, 100% { opacity: 1; transform: scale(1); }
-50% { opacity: 0.5; transform: scale(0.8); }
-}
-
-.firm-desc {
-font-size: 13px;
-color: var(–text2);
-line-height: 1.55;
-margin-bottom: 16px;
-}
-
-.firm-tools-preview {
-display: flex;
-flex-wrap: wrap;
-gap: 6px;
-margin-bottom: 16px;
-}
-
-.tool-tag {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-padding: 3px 7px;
-border-radius: 3px;
-background: rgba(255,255,255,0.04);
-border: 1px solid var(–border);
-color: var(–text3);
-}
-
-.firm-metrics {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 8px;
-padding-top: 16px;
-border-top: 1px solid var(–border);
-}
-
-.firm-metric-item { text-align: center; }
-
-.firm-metric-val {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 16px;
-color: var(–text);
-}
-
-.firm-metric-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 9px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 0.5px;
-}
-
-.firm-card-arrow {
-position: absolute;
-top: 24px;
-right: 20px;
-font-size: 18px;
-color: var(–text3);
-transition: all 0.2s;
-}
-.firm-card:hover .firm-card-arrow { color: var(–accent3); transform: translateX(3px); }
-
-/* ─── AI MATURITY BAR ─── */
-.ai-bar-wrap {
-margin-top: 4px;
-margin-bottom: 16px;
-}
-.ai-bar-label {
-display: flex;
-justify-content: space-between;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-color: var(–text3);
-margin-bottom: 5px;
-}
-.ai-bar-track {
-height: 4px;
-background: var(–surface2);
-border-radius: 2px;
-overflow: hidden;
-}
-.ai-bar-fill {
-height: 100%;
-border-radius: 2px;
-background: linear-gradient(90deg, var(–accent), var(–accent3));
-transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-}
-
-/* ─── FIRM DETAIL VIEW ─── */
-.firm-detail {
-max-width: 1200px;
-margin: 0 auto;
-padding: 40px 24px 80px;
-}
-
-.back-btn {
-display: inline-flex;
-align-items: center;
-gap: 8px;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 12px;
-color: var(–text3);
-cursor: pointer;
-margin-bottom: 32px;
-padding: 8px 12px;
-border: 1px solid var(–border);
-border-radius: 4px;
-background: transparent;
-transition: all 0.15s;
-}
-.back-btn:hover { color: var(–text); border-color: var(–accent); }
-
-.firm-detail-header {
-display: grid;
-grid-template-columns: 1fr auto;
-gap: 24px;
-align-items: start;
-margin-bottom: 40px;
-}
-
-.detail-firm-name {
-font-family: ‘Syne’, sans-serif;
-font-weight: 800;
-font-size: clamp(28px, 4vw, 44px);
-letter-spacing: -2px;
-margin-bottom: 8px;
-}
-
-.detail-firm-subtitle {
-font-size: 15px;
-color: var(–text2);
-max-width: 560px;
-line-height: 1.6;
-margin-bottom: 20px;
-}
-
-.detail-tags {
-display: flex;
-flex-wrap: wrap;
-gap: 8px;
-}
-
-.detail-tag {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 11px;
-padding: 4px 10px;
-border-radius: 3px;
-border: 1px solid;
-}
-
-.tag-platform { border-color: rgba(61,110,255,0.4); color: #7b9fff; background: rgba(61,110,255,0.08); }
-.tag-ai { border-color: rgba(0,212,255,0.4); color: #5fd8ff; background: rgba(0,212,255,0.08); }
-.tag-coverage { border-color: rgba(0,229,160,0.4); color: #4df0bd; background: rgba(0,229,160,0.08); }
-
-.firm-stats-row {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-gap: 12px;
-margin-bottom: 40px;
-}
-
-.firm-stat-box {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 6px;
-padding: 16px;
-}
-
-.fsb-value {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 22px;
-letter-spacing: -1px;
-color: var(–text);
-margin-bottom: 4px;
-}
-
-.fsb-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 1px;
-}
-
-/* ─── TOOLS SECTION ─── */
-.tools-section-title {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 13px;
-letter-spacing: 2px;
-text-transform: uppercase;
-color: var(–text2);
-margin-bottom: 16px;
-padding-bottom: 12px;
-border-bottom: 1px solid var(–border);
-}
-
-.tools-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-gap: 16px;
-margin-bottom: 48px;
-}
-
-.tool-card {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 8px;
-padding: 20px;
-cursor: pointer;
-transition: all 0.2s;
-}
-
-.tool-card:hover {
-border-color: var(–border2);
-transform: translateY(-2px);
-box-shadow: 0 6px 30px rgba(0,0,0,0.35);
-}
-
-.tool-card-header {
-display: flex;
-align-items: flex-start;
-gap: 12px;
-margin-bottom: 14px;
-}
-
-.tool-icon {
-width: 36px;
-height: 36px;
-border-radius: 6px;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 16px;
-flex-shrink: 0;
-background: var(–surface2);
-}
-
-.tool-info { flex: 1; }
-
-.tool-name {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 15px;
-letter-spacing: -0.3px;
-margin-bottom: 2px;
-}
-
-.tool-category {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 0.8px;
-}
-
-.tool-desc {
-font-size: 13px;
-color: var(–text2);
-line-height: 1.55;
-margin-bottom: 14px;
-}
-
-.tool-capabilities {
-display: flex;
-flex-wrap: wrap;
-gap: 5px;
-margin-bottom: 14px;
-}
-
-.cap-tag {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-padding: 2px 6px;
-border-radius: 2px;
-background: rgba(255,255,255,0.04);
-border: 1px solid var(–border);
-color: var(–text3);
-}
-
-.tool-meta-row {
-display: grid;
-grid-template-columns: 1fr 1fr 1fr;
-gap: 8px;
-padding-top: 12px;
-border-top: 1px solid var(–border);
-}
-
-.tool-meta-item {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 9px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 0.5px;
-}
-.tool-meta-item span {
-display: block;
-color: var(–text2);
-font-size: 11px;
-margin-top: 2px;
-text-transform: none;
-letter-spacing: 0;
-}
-
-.phase-badge {
-display: inline-flex;
-align-items: center;
-gap: 4px;
-font-size: 10px;
-padding: 2px 6px;
-border-radius: 3px;
-font-family: ‘IBM Plex Mono’, monospace;
-}
-.phase-planning { background: rgba(245,166,35,0.15); color: var(–gold); border: 1px solid rgba(245,166,35,0.3); }
-.phase-execution { background: rgba(61,110,255,0.15); color: #7b9fff; border: 1px solid rgba(61,110,255,0.3); }
-.phase-completion { background: rgba(0,229,160,0.15); color: var(–green); border: 1px solid rgba(0,229,160,0.3); }
-.phase-all { background: rgba(255,255,255,0.06); color: var(–text2); border: 1px solid var(–border); }
-
-/* ─── TOOL DETAIL VIEW ─── */
-.tool-detail {
-max-width: 1100px;
-margin: 0 auto;
-padding: 40px 24px 80px;
-}
-
-.tool-detail-hero {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 10px;
-padding: 32px;
-margin-bottom: 32px;
-position: relative;
-overflow: hidden;
-}
-
-.tool-detail-hero::before {
-content: ‘’;
-position: absolute;
-top: -60px; right: -60px;
-width: 240px; height: 240px;
-border-radius: 50%;
-background: radial-gradient(ellipse, rgba(61,110,255,0.12) 0%, transparent 70%);
-pointer-events: none;
-}
-
-.tdh-breadcrumb {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 11px;
-color: var(–text3);
-margin-bottom: 20px;
-}
-.tdh-breadcrumb span { color: var(–text2); cursor: pointer; }
-.tdh-breadcrumb span:hover { color: var(–accent3); }
-
-.tdh-main {
-display: grid;
-grid-template-columns: 1fr auto;
-gap: 24px;
-align-items: start;
-}
-
-.tdh-icon-name {
-display: flex;
-align-items: center;
-gap: 16px;
-margin-bottom: 12px;
-}
-
-.tdh-big-icon {
-width: 56px;
-height: 56px;
-border-radius: 10px;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 24px;
-background: var(–surface2);
-flex-shrink: 0;
-}
-
-.tdh-tool-name {
-font-family: ‘Syne’, sans-serif;
-font-weight: 800;
-font-size: clamp(22px, 3vw, 36px);
-letter-spacing: -1.5px;
-}
-
-.tdh-desc {
-font-size: 15px;
-color: var(–text2);
-line-height: 1.65;
-max-width: 680px;
-margin-bottom: 20px;
-}
-
-.tdh-tags {
-display: flex;
-flex-wrap: wrap;
-gap: 6px;
-}
-
-/* ─── MOCK DASHBOARD ─── */
-.mock-dashboard {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 10px;
-overflow: hidden;
-margin-bottom: 32px;
-}
-
-.mock-dash-header {
-background: var(–surface2);
-border-bottom: 1px solid var(–border);
-padding: 12px 20px;
-display: flex;
-align-items: center;
-gap: 12px;
-}
-
-.mock-dash-dots {
-display: flex;
-gap: 6px;
-}
-.mock-dash-dot {
-width: 10px;
-height: 10px;
-border-radius: 50%;
-}
-.dot-red { background: #ff5f57; }
-.dot-yellow { background: #febc2e; }
-.dot-green { background: #28c840; }
-
-.mock-dash-title {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 11px;
-color: var(–text3);
-flex: 1;
-text-align: center;
-}
-
-.mock-dash-body {
-padding: 20px;
-}
-
-/* ─── COMPARISON TABLE ─── */
-.comparison-section {
-max-width: 1400px;
-margin: 0 auto;
-padding: 0 24px 80px;
-}
-
-.comp-table-wrap {
-overflow-x: auto;
-border: 1px solid var(–border);
-border-radius: 8px;
-}
-
-.comp-table {
-width: 100%;
-border-collapse: collapse;
-min-width: 800px;
-}
-
-.comp-table th {
-background: var(–surface2);
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-text-transform: uppercase;
-letter-spacing: 1px;
-color: var(–text3);
-padding: 12px 16px;
-text-align: left;
-border-bottom: 1px solid var(–border);
-white-space: nowrap;
-}
-
-.comp-table td {
-padding: 14px 16px;
-border-bottom: 1px solid var(–border);
-font-size: 13px;
-vertical-align: middle;
-}
-
-.comp-table tr:last-child td { border-bottom: none; }
-.comp-table tr { cursor: pointer; transition: background 0.15s; }
-.comp-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-.comp-firm-cell {
-display: flex;
-align-items: center;
-gap: 10px;
-}
-
-.comp-firm-dot {
-width: 8px;
-height: 8px;
-border-radius: 50%;
-flex-shrink: 0;
-}
-
-.check { color: var(–green); font-size: 14px; }
-.partial { color: var(–gold); font-size: 14px; }
-.cross { color: var(–text3); font-size: 14px; }
-
-/* ─── RADAR CHART SVG ─── */
-.radar-wrap {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 24px;
-max-width: 1400px;
-margin: 0 auto;
-padding: 0 24px 80px;
-}
-
-.radar-card {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 8px;
-padding: 24px;
-}
-
-.radar-card-title {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 15px;
-letter-spacing: -0.3px;
-margin-bottom: 4px;
-}
-.radar-card-sub {
-font-size: 12px;
-color: var(–text3);
-margin-bottom: 20px;
-}
-
-/* ─── SCROLL ANIMATIONS ─── */
-@keyframes fadeInUp {
-from { opacity: 0; transform: translateY(16px); }
-to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-in {
-animation: fadeInUp 0.4s ease forwards;
-}
-
-.stagger-1 { animation-delay: 0.05s; }
-.stagger-2 { animation-delay: 0.10s; }
-.stagger-3 { animation-delay: 0.15s; }
-.stagger-4 { animation-delay: 0.20s; }
-.stagger-5 { animation-delay: 0.25s; }
-.stagger-6 { animation-delay: 0.30s; }
-.stagger-7 { animation-delay: 0.35s; }
-.stagger-8 { animation-delay: 0.40s; }
-
-/* ─── SEARCH ─── */
-.search-wrap {
-max-width: 1400px;
-margin: 0 auto;
-padding: 0 24px 24px;
-}
-
-.search-input {
-width: 100%;
-max-width: 400px;
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 6px;
-padding: 10px 16px;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 13px;
-color: var(–text);
-outline: none;
-transition: border-color 0.15s;
-}
-.search-input:focus { border-color: var(–accent); }
-.search-input::placeholder { color: var(–text3); }
-
-/* ─── TAB SWITCHER ─── */
-.tab-bar {
-max-width: 1400px;
-margin: 0 auto;
-padding: 0 24px 32px;
-display: flex;
-gap: 4px;
-border-bottom: 1px solid var(–border);
-margin-bottom: 40px;
-}
-
-.tab-btn {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 12px;
-padding: 8px 16px;
-background: transparent;
-border: none;
-color: var(–text3);
-cursor: pointer;
-border-bottom: 2px solid transparent;
-margin-bottom: -1px;
-transition: all 0.15s;
-}
-.tab-btn:hover { color: var(–text2); }
-.tab-btn.active { color: var(–accent3); border-bottom-color: var(–accent3); }
-
-/* ─── DETAIL GRID ─── */
-.detail-grid-2 {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 20px;
-margin-bottom: 24px;
-}
-
-@media (max-width: 640px) {
-.detail-grid-2 { grid-template-columns: 1fr; }
-.radar-wrap { grid-template-columns: 1fr; }
-.tdh-main { grid-template-columns: 1fr; }
-.firm-detail-header { grid-template-columns: 1fr; }
-}
-
-.info-box {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: 8px;
-padding: 20px;
-}
-
-.info-box-title {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 10px;
-text-transform: uppercase;
-letter-spacing: 1px;
-color: var(–text3);
-margin-bottom: 12px;
-}
-
-.bullet-list {
-list-style: none;
-}
-
-.bullet-list li {
-font-size: 13px;
-color: var(–text2);
-padding: 5px 0;
-border-bottom: 1px solid rgba(255,255,255,0.04);
-display: flex;
-align-items: flex-start;
-gap: 8px;
-line-height: 1.5;
-}
-.bullet-list li:last-child { border-bottom: none; }
-.bullet-list li::before {
-content: ‘▸’;
-color: var(–accent3);
-flex-shrink: 0;
-margin-top: 1px;
-}
-
-/* SVG MINI CHARTS */
-.mini-chart-row {
-display: flex;
-align-items: flex-end;
-gap: 3px;
-height: 32px;
-}
-.mini-bar {
-width: 8px;
-border-radius: 2px 2px 0 0;
-background: linear-gradient(180deg, var(–accent3), var(–accent));
-opacity: 0.7;
-transition: opacity 0.2s;
-}
-.mini-bar:hover { opacity: 1; }
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(–surface); }
-::-webkit-scrollbar-thumb { background: var(–border2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(–text3); }
-
-/* ─── MATURITY GRID ─── */
-.maturity-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-gap: 10px;
-margin-bottom: 12px;
-}
-
-.maturity-item {
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 6px;
-padding: 12px;
-text-align: center;
-}
-
-.maturity-score {
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 22px;
-letter-spacing: -1px;
-margin-bottom: 2px;
-}
-
-.maturity-dim {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 9px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 0.5px;
-}
-
-/* Hexagon accent */
-.hex-accent {
-position: absolute;
-right: 20px;
-top: 20px;
-opacity: 0.06;
-font-size: 80px;
-line-height: 1;
-user-select: none;
-pointer-events: none;
-}
-
-/* ─── COMPETITIVE POSITIONING ─── */
-.positioning-chart {
-width: 100%;
-height: 320px;
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 8px;
-position: relative;
-overflow: hidden;
-}
-
-.pos-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 9px;
-color: var(–text3);
-position: absolute;
-text-transform: uppercase;
-letter-spacing: 0.5px;
-}
-
-.pos-node {
-position: absolute;
-transform: translate(-50%, -50%);
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 4px;
-cursor: pointer;
-transition: all 0.2s;
-}
-
-.pos-node:hover { transform: translate(-50%, -50%) scale(1.1); }
-
-.pos-circle {
-width: 36px;
-height: 36px;
-border-radius: 50%;
-display: flex;
-align-items: center;
-justify-content: center;
-font-family: ‘Syne’, sans-serif;
-font-weight: 700;
-font-size: 10px;
-color: #fff;
-box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-}
-
-.pos-node-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 9px;
-color: var(–text2);
-white-space: nowrap;
-}
-
-/* Grid lines on positioning chart */
-.pos-grid-h, .pos-grid-v {
-position: absolute;
-background: rgba(255,255,255,0.04);
-pointer-events: none;
-}
-.pos-grid-h { left: 0; right: 0; height: 1px; top: 50%; }
-.pos-grid-v { top: 0; bottom: 0; width: 1px; left: 50%; }
+:root{--bg:#080c18;--surface:#0f1628;--surface2:#151d35;--border:#1e2d52;--border2:#253566;--text:#e8eeff;--text2:#8a9cc8;--text3:#4f6096;--accent:#3d6eff;--accent2:#6f3dff;--accent3:#00d4ff;--gold:#f5a623;--green:#00e5a0;--red:#ff4d6d;--pwc:#d04a02;--ey:#c8a800;--kpmg:#00338d;--deloitte:#86bc25;--gt:#6e2585;--bdo:#e4002b;--rsm:#005eb8;--crowe:#009a44}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(8,12,24,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:20px;z-index:1000}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.5px;color:var(--text);flex-shrink:0}
+.nav-logo span{color:var(--accent3)}
+.nav-breadcrumb{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);flex:1;overflow:hidden}
+.crumb{color:var(--text2);white-space:nowrap;cursor:pointer;transition:color .2s}.crumb:hover{color:var(--accent3)}
+.sep{color:var(--text3)}
+.nav-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;background:rgba(61,110,255,.15);border:1px solid rgba(61,110,255,.3);color:var(--accent3);padding:3px 8px;border-radius:3px;flex-shrink:0}
+.app{padding-top:56px;min-height:100vh;position:relative}
+.view{display:none}.view.active{display:block}
+.hero{padding:64px 24px 48px;max-width:1400px;margin:0 auto}
+.hero-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent3);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);line-height:1.0;letter-spacing:-2px;margin-bottom:16px}
+.hero h1 .dim{color:var(--text3)}
+.hero p{font-size:15px;color:var(--text2);max-width:560px;line-height:1.65;margin-bottom:32px}
+.stats-strip{max-width:1400px;margin:0 auto;padding:0 24px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
+.stat-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.stat-value{font-family:'Syne',sans-serif;font-weight:700;font-size:24px;letter-spacing:-1px;color:var(--text)}
+.stat-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.tab-bar{display:flex;gap:4px;border-bottom:1px solid var(--border);padding-bottom:0;margin-bottom:24px}
+.tab-btn{font-family:'IBM Plex Mono',monospace;font-size:12px;padding:8px 16px;background:transparent;border:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab-btn:hover{color:var(--text2)}.tab-btn.active{color:var(--accent3);border-bottom-color:var(--accent3)}
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;align-items:center}
+.filter-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.filter-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:5px 10px;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:3px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-btn:hover{border-color:var(--accent);color:var(--text)}.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:20px}
+.section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--text2)}
+.section-count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)}
+.firm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding-bottom:80px}
+.firm-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:24px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.firm-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.firm-card-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+.firm-logo-box{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;letter-spacing:-.5px}
+.firm-meta{flex:1;min-width:0}
+.firm-name{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;letter-spacing:-.5px;margin-bottom:3px}
+.firm-tier{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3)}
+.firm-flagship{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:6px 10px;margin-bottom:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2)}
+.flagship-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.firm-desc{font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:16px}
+.firm-tools-preview{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tool-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:3px 7px;border-radius:3px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text3)}
+.firm-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-top:16px;border-top:1px solid var(--border)}
+.firm-metric-item{text-align:center}
+.firm-metric-val{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--text)}
+.firm-metric-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.firm-card-arrow{position:absolute;top:24px;right:20px;font-size:18px;color:var(--text3);transition:all .2s}
+.firm-card:hover .firm-card-arrow{color:var(--accent3);transform:translateX(3px)}
+.ai-bar-wrap{margin-top:4px;margin-bottom:16px}
+.ai-bar-label{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:5px}
+.ai-bar-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.ai-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .8s cubic-bezier(.4,0,.2,1)}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text3);cursor:pointer;margin-bottom:32px;padding:8px 12px;border:1px solid var(--border);border-radius:4px;background:transparent;transition:all .15s}
+.back-btn:hover{color:var(--text);border-color:var(--accent)}
+.firm-detail{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
+.firm-detail-header{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start;margin-bottom:40px}
+.detail-firm-name{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(28px,4vw,44px);letter-spacing:-2px;margin-bottom:8px}
+.detail-firm-subtitle{font-size:15px;color:var(--text2);max-width:560px;line-height:1.6;margin-bottom:20px}
+.detail-tags{display:flex;flex-wrap:wrap;gap:8px}
+.detail-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 10px;border-radius:3px;border:1px solid}
+.tag-platform{border-color:rgba(61,110,255,.4);color:#7b9fff;background:rgba(61,110,255,.08)}
+.tag-ai{border-color:rgba(0,212,255,.4);color:#5fd8ff;background:rgba(0,212,255,.08)}
+.tag-coverage{border-color:rgba(0,229,160,.4);color:#4df0bd;background:rgba(0,229,160,.08)}
+.firm-stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:40px}
+.firm-stat-box{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px}
+.fsb-value{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-1px;color:var(--text);margin-bottom:4px}
+.fsb-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.tools-section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:48px}
+.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;cursor:pointer;transition:all .2s}
+.tool-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 6px 30px rgba(0,0,0,.35)}
+.tool-card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.tool-icon{width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:var(--surface2)}
+.tool-info{flex:1}
+.tool-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;letter-spacing:-.3px;margin-bottom:2px}
+.tool-category{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px}
+.tool-desc{font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:14px}
+.tool-capabilities{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.cap-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text3)}
+.tool-meta-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid var(--border)}
+.tool-meta-item{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.tool-meta-item span{display:block;color:var(--text2);font-size:11px;margin-top:2px;text-transform:none;letter-spacing:0}
+.phase-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace}
+.phase-planning{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.phase-execution{background:rgba(61,110,255,.15);color:#7b9fff;border:1px solid rgba(61,110,255,.3)}
+.phase-completion{background:rgba(0,229,160,.15);color:var(--green);border:1px solid rgba(0,229,160,.3)}
+.phase-all{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border)}
+.tool-detail{max-width:1100px;margin:0 auto;padding:40px 24px 80px}
+.tool-detail-hero{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:32px;margin-bottom:32px;position:relative;overflow:hidden}
+.tool-detail-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(ellipse,rgba(61,110,255,.12) 0%,transparent 70%);pointer-events:none}
+.tdh-breadcrumb{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:20px}
+.tdh-breadcrumb span{color:var(--text2);cursor:pointer}.tdh-breadcrumb span:hover{color:var(--accent3)}
+.tdh-main{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start}
+.tdh-icon-name{display:flex;align-items:center;gap:16px;margin-bottom:12px}
+.tdh-big-icon{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--surface2);flex-shrink:0}
+.tdh-tool-name{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(22px,3vw,36px);letter-spacing:-1.5px}
+.tdh-desc{font-size:15px;color:var(--text2);line-height:1.65;max-width:680px;margin-bottom:20px}
+.tdh-tags{display:flex;flex-wrap:wrap;gap:6px}
+.mock-dashboard{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:32px}
+.mock-dash-header{background:var(--surface2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px}
+.mock-dash-dots{display:flex;gap:6px}
+.mock-dash-dot{width:10px;height:10px;border-radius:50%}
+.dot-red{background:#ff5f57}.dot-yellow{background:#febc2e}.dot-green{background:#28c840}
+.mock-dash-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);flex:1;text-align:center}
+.mock-dash-body{padding:20px}
+.comp-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px}
+.comp-table{width:100%;border-collapse:collapse;min-width:800px}
+.comp-table th{background:var(--surface2);font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:12px 16px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.comp-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.comp-table tr:last-child td{border-bottom:none}
+.comp-table tr{cursor:pointer;transition:background .15s}
+.comp-table tr:hover td{background:rgba(255,255,255,.02)}
+.comp-firm-cell{display:flex;align-items:center;gap:10px}
+.comp-firm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.check{color:var(--green);font-size:14px}.partial{color:var(--gold);font-size:14px}.cross{color:var(--text3);font-size:14px}
+.positioning-chart{width:100%;height:320px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;position:relative;overflow:hidden}
+.pos-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);position:absolute;text-transform:uppercase;letter-spacing:.5px}
+.pos-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .2s}
+.pos-node:hover{transform:translate(-50%,-50%) scale(1.1)}
+.pos-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:10px;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.pos-node-label{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text2);white-space:nowrap}
+.pos-grid-h,.pos-grid-v{position:absolute;background:rgba(255,255,255,.04);pointer-events:none}
+.pos-grid-h{left:0;right:0;height:1px;top:50%}.pos-grid-v{top:0;bottom:0;width:1px;left:50%}
+.detail-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.info-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px}
+.info-box-title{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:12px}
+.bullet-list{list-style:none}
+.bullet-list li{font-size:13px;color:var(--text2);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.bullet-list li:last-child{border-bottom:none}
+.bullet-list li::before{content:'▸';color:var(--accent3);flex-shrink:0;margin-top:1px}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeInUp .4s ease forwards}
+.stagger-1{animation-delay:.05s}.stagger-2{animation-delay:.10s}.stagger-3{animation-delay:.15s}.stagger-4{animation-delay:.20s}.stagger-5{animation-delay:.25s}.stagger-6{animation-delay:.30s}.stagger-7{animation-delay:.35s}.stagger-8{animation-delay:.40s}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+@media(max-width:640px){.detail-grid-2{grid-template-columns:1fr}.tdh-main{grid-template-columns:1fr}.firm-detail-header{grid-template-columns:1fr}}
 </style>
-
 </head>
 <body>
-
-<!-- NAVIGATION -->
-
 <nav>
   <div class="nav-logo">Audit<span>Intel</span></div>
-  <div class="nav-breadcrumb" id="breadcrumb">
-    <span class="crumb" onclick="showView('home')">Market Overview</span>
-  </div>
-  <div class="nav-badge">FY2025 · Live Intel</div>
+  <div class="nav-breadcrumb" id="breadcrumb"><span class="crumb" onclick="showView('home')">Market Overview</span></div>
+  <div class="nav-badge">FY2026 · Live Intel</div>
 </nav>
-
-<!-- APP WRAPPER -->
-
 <div class="app">
 
-<!-- ════════════════════ HOME VIEW ════════════════════ -->
+<!-- HOME -->
 
 <div id="view-home" class="view active">
-
   <div class="hero">
     <div class="hero-tag">// Audit Analytics Competitive Intelligence</div>
-    <h1>The Battle for <br><span class="dim">the Digital Audit</span></h1>
+    <h1>The Battle for<br><span class="dim">the Digital Audit</span></h1>
     <p>Comprehensive intelligence on how the world's leading audit firms are deploying data analytics, AI, and automation platforms to transform financial statement auditing.</p>
   </div>
-
-  <!-- STATS STRIP -->
-
   <div class="stats-strip">
-    <div class="stat-card animate-in stagger-1">
-      <div class="stat-label">Firms Tracked</div>
-      <div class="stat-value">8</div>
-      <div class="stat-sub">Big 4 + Mid-tier</div>
-    </div>
-    <div class="stat-card animate-in stagger-2">
-      <div class="stat-label">Analytics Tools</div>
-      <div class="stat-value">32+</div>
-      <div class="stat-sub">Across all platforms</div>
-    </div>
-    <div class="stat-card animate-in stagger-3">
-      <div class="stat-label">Auditors Enabled</div>
-      <div class="stat-value">370K+</div>
-      <div class="stat-sub">Global professionals</div>
-    </div>
-    <div class="stat-card animate-in stagger-4">
-      <div class="stat-label">Platform Maturity</div>
-      <div class="stat-value">GenAI</div>
-      <div class="stat-sub">Industry inflection point</div>
-    </div>
-    <div class="stat-card animate-in stagger-5">
-      <div class="stat-label">Last Updated</div>
-      <div class="stat-value">Apr '26</div>
-      <div class="stat-sub">Q2 FY2026</div>
+    <div class="stat-card animate-in stagger-1"><div class="stat-label">Firms Tracked</div><div class="stat-value">8</div><div class="stat-sub">Big 4 + Mid-tier</div></div>
+    <div class="stat-card animate-in stagger-2"><div class="stat-label">Analytics Tools</div><div class="stat-value">32+</div><div class="stat-sub">Across all platforms</div></div>
+    <div class="stat-card animate-in stagger-3"><div class="stat-label">Auditors Enabled</div><div class="stat-value">370K+</div><div class="stat-sub">Global professionals</div></div>
+    <div class="stat-card animate-in stagger-4"><div class="stat-label">AI Frontier</div><div class="stat-value">Agentic</div><div class="stat-sub">Industry inflection 2025</div></div>
+    <div class="stat-card animate-in stagger-5"><div class="stat-label">Last Updated</div><div class="stat-value">Apr '26</div><div class="stat-sub">Q2 FY2026</div></div>
+  </div>
+  <div style="max-width:1400px;margin:0 auto;padding:0 24px;">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchMainTab('firms',this)">Firms</button>
+      <button class="tab-btn" onclick="switchMainTab('compare',this)">Comparison Matrix</button>
+      <button class="tab-btn" onclick="switchMainTab('positioning',this)">Positioning Map</button>
     </div>
   </div>
-
-  <!-- TAB BAR -->
-
-  <div style="max-width:1400px;margin:0 auto;padding:0 24px 0;">
-    <div class="tab-bar" style="border-bottom:none;padding-bottom:0;margin-bottom:24px;">
-      <button class="tab-btn active" onclick="switchMainTab('firms', this)">Firms</button>
-      <button class="tab-btn" onclick="switchMainTab('compare', this)">Comparison Matrix</button>
-      <button class="tab-btn" onclick="switchMainTab('positioning', this)">Positioning Map</button>
-    </div>
-  </div>
-
-  <!-- FIRMS TAB -->
-
-  <div id="main-tab-firms">
+  <div id="main-tab-firms" style="max-width:1400px;margin:0 auto;padding:0 24px;">
     <div class="filter-bar">
       <span class="filter-label">Tier:</span>
-      <div class="filter-group">
-        <button class="filter-btn active" onclick="setFilter('tier','all',this)">All</button>
-        <button class="filter-btn" onclick="setFilter('tier','big4',this)">Big 4</button>
-        <button class="filter-btn" onclick="setFilter('tier','mid',this)">Mid-Tier</button>
-      </div>
-      <span class="filter-label" style="margin-left:12px;">AI Maturity:</span>
-      <div class="filter-group">
-        <button class="filter-btn active" onclick="setFilter('ai','all',this)">All</button>
-        <button class="filter-btn" onclick="setFilter('ai','agentic',this)">Agentic AI</button>
-        <button class="filter-btn" onclick="setFilter('ai','genai',this)">GenAI</button>
-      </div>
+      <button class="filter-btn active" onclick="setFilter('tier','all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('tier','big4',this)">Big 4</button>
+      <button class="filter-btn" onclick="setFilter('tier','mid',this)">Mid-Tier</button>
+      <span class="filter-label" style="margin-left:12px">AI Maturity:</span>
+      <button class="filter-btn active" onclick="setFilter('ai','all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('ai','agentic',this)">Agentic AI</button>
+      <button class="filter-btn" onclick="setFilter('ai','genai',this)">GenAI</button>
     </div>
-
-```
-<div class="section-header">
-  <div class="section-title">Audit Firms</div>
-  <div class="section-count" id="firm-count">8 firms</div>
+    <div class="section-header"><div class="section-title">Audit Firms</div><div class="section-count" id="firm-count">8 firms</div></div>
+    <div class="firm-grid" id="firm-grid"></div>
+  </div>
+  <div id="main-tab-compare" style="display:none;max-width:1400px;margin:0 auto;padding:0 24px 80px;">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Feature-level comparison across all tracked platforms. Click any row to drill into the firm.</p>
+    <div class="comp-table-wrap"><table class="comp-table" id="compare-table"></table></div>
+  </div>
+  <div id="main-tab-positioning" style="display:none;max-width:1400px;margin:0 auto;padding:0 24px 80px;">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Relative positioning by AI integration maturity vs. analytics breadth. Click nodes to explore firms.</p>
+    <div class="positioning-chart" id="positioning-chart">
+      <div class="pos-grid-h"></div><div class="pos-grid-v"></div>
+      <div class="pos-label" style="top:8px;left:12px">↑ Higher AI Maturity</div>
+      <div class="pos-label" style="bottom:8px;left:12px">↓ Lower AI Maturity</div>
+      <div class="pos-label" style="bottom:8px;right:12px">Analytics Breadth →</div>
+    </div>
+  </div>
 </div>
 
-<div class="firm-grid" id="firm-grid"></div>
-```
-
-  </div>
-
-  <!-- COMPARE TAB -->
-
-  <div id="main-tab-compare" style="display:none; max-width:1400px;margin:0 auto;padding:0 24px 80px;">
-    <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Feature-level comparison across all tracked platforms. Click any row to drill into the firm.</p>
-    <div class="comp-table-wrap">
-      <table class="comp-table" id="compare-table"></table>
-    </div>
-  </div>
-
-  <!-- POSITIONING TAB -->
-
-  <div id="main-tab-positioning" style="display:none; max-width:1400px;margin:0 auto;padding:0 24px 80px;">
-    <p style="font-size:13px;color:var(--text2);margin-bottom:24px;">Relative positioning by AI integration maturity vs. analytics breadth (tool count). Click nodes to explore firms.</p>
-    <div class="positioning-chart" id="positioning-chart">
-      <div class="pos-grid-h"></div>
-      <div class="pos-grid-v"></div>
-      <div class="pos-label" style="top:8px;left:50%;transform:translateX(-50%)">← Analytics Breadth →</div>
-      <div class="pos-label" style="bottom:8px;right:12px">Low AI Maturity</div>
-      <div class="pos-label" style="top:8px;right:12px">High AI Maturity</div>
-    </div>
-  </div>
-
-</div><!-- /view-home -->
-
-<!-- ════════════════════ FIRM DETAIL VIEW ════════════════════ -->
+<!-- FIRM DETAIL -->
 
 <div id="view-firm" class="view">
   <div class="firm-detail" id="firm-detail-content"></div>
 </div>
 
-<!-- ════════════════════ TOOL DETAIL VIEW ════════════════════ -->
+<!-- TOOL DETAIL -->
 
 <div id="view-tool" class="view">
   <div class="tool-detail" id="tool-detail-content"></div>
 </div>
 
-</div><!-- /app -->
-
+</div>
 <script>
-// ─── DATA ───────────────────────────────────────────────────────────────────
+const FIRMS=[{id:'deloitte',name:'Deloitte',tier:'big4',color:'#86bc25',logo:'D',flagship:'Omnia',launched:2015,auditors:'85,000+',countries:'150+',aiLevel:'agentic',aiScore:93,breadth:9,desc:"Deloitte's Omnia platform — launched 2015, winner of the 2024 IAF AI Innovation Initiative of the Year — delivers GenAI and agentic AI to 85,000+ audit professionals globally. The July 2025 expansion added AI documentation review, financial statement navigation, data extraction, memo drafting, and autonomous agent networks. [Source: deloitte.com press release, July 2025; IAF 2024 award]",tools:[{id:'omnia-core',name:'Omnia Platform',category:'Core Audit Platform',icon:'⚙️',phase:'all',desc:"Cloud-based global audit and assurance platform. July 2025 brought GenAI documentation review, financial statement navigation, data extraction, memo drafting, and agentic AI agents that autonomously gather data, manage project plans, and detect transaction anomalies.",capabilities:['Risk Assessment','JE Analytics','GL Population Testing','Real-time Dashboards','SOX Workflow','Client Portal','GenAI Docs','Agentic Agents'],balances:['All Accounts'],industries:['Cross-Industry'],methodology:'Risk-based full-population',aiIntegration:'Full GenAI + Agentic AI',details:{description:"Omnia is Deloitte's flagship global audit platform used on every Deloitte audit worldwide. The July 2025 press release announced GenAI documentation review with clarity/consistency suggestions, natural language navigation of uploaded draft financial statements, cross-document data extraction and summarization, first-draft generation for audit memos and communications, AI research assistance for accounting/auditing topics, and agentic AI layer where autonomous agents gather data from diverse sources, compare and analyze information, manage project plans, and detect transaction anomalies. Recognized as 2024 IAF AI Innovation Initiative of the Year. [Source: deloitte.com/us/en/about/press-room/deloitte-expands-AI-capabilities-in-omnia-global-audit-platform.html]",keyFeatures:['GenAI documentation review with clarity/consistency suggestions (July 2025)','Natural language navigation of uploaded draft financial statements','Cross-document data extraction and summarization via GenAI','First-draft generation for audit communications and accounting memos','AI research assistant for complex accounting/auditing topics','Autonomous agents that gather, compare and analyze data across sources','Agent-driven project plan management and milestone tracking','Agent-driven transaction anomaly detection'],limitations:['Proprietary platform — no external access','Agent capabilities in phased rollout as of July 2025','Human review required on all AI-generated outputs per press release'],aiCapabilities:['GenAI','Agentic AI','LLMs','Document Intelligence'],coverage:['Journal Entries','Revenue','Payables','Inventory','Fixed Assets','Equity','Cash','Derivatives'],techStack:'Cloud-native (per public press release; detailed stack not publicly disclosed)'}},{id:'dartbot',name:'DARTbot',category:'AI Research Tool',icon:'🤖',phase:'planning',desc:"Deloitte's internal GenAI tool for audit professionals providing research on complex accounting and auditing topics. Publicly announced as part of Omnia AI expansion.",capabilities:['Accounting Research','Standards Q&A','Audit Guidance','Memo Drafting'],balances:['N/A — Research Tool'],industries:['Cross-Industry'],methodology:'RAG + LLM',aiIntegration:'Native GenAI',details:{description:"DARTbot is Deloitte's internal GenAI chatbot mentioned in public Omnia press releases. Enables efficient research on complex accounting and auditing topics for audit professionals. [Source: deloitte.com press release, July 2025]",keyFeatures:['Natural language access to accounting and auditing standards','Research assistance for complex technical accounting questions','Supports audit memo drafting and documentation','Part of broader Omnia AI capability suite'],limitations:['Internal use only — not available externally','Detailed usage metrics not publicly disclosed'],aiCapabilities:['RAG','LLM','Natural Language Search'],coverage:['All Financial Statement Areas'],techStack:'Proprietary (not publicly disclosed)'}}],strengths:['Longest-running Big 4 analytics platform (2015)','2024 IAF AI Innovation Initiative of the Year','Agentic AI publicly deployed as of July 2025','85,000+ audit professionals on platform','Global reach across 150+ countries'],weaknesses:['Internal tech stack not publicly disclosed — limits competitive benchmarking','Agentic agent scope details limited in public disclosures'],recentNews:'July 2025: Deloitte announced GenAI and agentic AI expansion in Omnia. Autonomous agents added for data gathering, project management, and anomaly detection. Won 2024 IAF AI Innovation Initiative of the Year. [Source: deloitte.com press release July 2025]'},{id:'pwc',name:'PwC',tier:'big4',color:'#d04a02',logo:'P',flagship:'Halo Suite',launched:2016,auditors:'100,000+',countries:'158',aiLevel:'genai',aiScore:88,breadth:8,desc:"PwC's Halo suite — 2016 IAB Audit Innovation of the Year — is a multi-tiered analytics platform for data extraction, visualization, and auditing. Combined with Aura (audit management), Connect (collaboration), and Extract (data tools), it forms the four pillars of the PwC digital audit used by 100,000+ auditors.",tools:[{id:'halo-core',name:'Halo Suite',category:'Data Analytics & Visualization',icon:'🔵',phase:'execution',desc:'Award-winning data extraction, visualization, and auditing platform. Tests entire transaction populations using advanced algorithms to identify outliers and higher-risk items. 80M+ journal entries processed globally.',capabilities:['Full Population Testing','Risk Visualization','JE Analysis','Anomaly Detection','Trend Analysis','Ratio Analysis','Blockchain/Crypto'],balances:['Journal Entries','Revenue','Fixed Assets','Inventory','Payables','Cash','Crypto'],industries:['Cross-Industry','Financial Services','Manufacturing','Retail','Energy','Crypto'],methodology:'Algorithm-based population analytics',aiIntegration:'ML Algorithms + Developing GenAI',details:{description:"Halo is PwC's leading-edge data extraction, auditing, and visualization platform. Originally launched as 'Halo for Journals' in 2016 (IAB Audit Innovation of the Year), it has expanded to revenue, payables, inventory, and more. Works with any ERP at any scale — 80M+ journal entries processed globally. Features include color-coded visual dashboards, drill-down to individual transactions, and cryptocurrency/blockchain audit capability.",keyFeatures:['Full population JE testing — eliminates sampling risk','Color-coded visual dashboards (red/yellow/green risk indicators)','Drill-down from aggregate view to individual transaction level','Automated ratio and trend analysis from audit data','Multi-hosted server architecture for secure client data handling','Cryptocurrency/blockchain transaction tracking and verification','Extract module for automated, standardized ERP data extraction','Works with SAP, Oracle, NetSuite, and all major ERPs'],limitations:['GenAI capabilities less publicized vs KPMG/Deloitte','Separate Extract step adds process complexity','Visual dashboards require analyst interpretation'],aiCapabilities:['Statistical Algorithms','Anomaly Detection','ML Scoring','Visualization AI'],coverage:['Journal Entries','Revenue','Fixed Assets','Inventory','Payables','Treasury','Blockchain/Crypto'],techStack:'Multi-tiered server architecture, cloud-hosted, proprietary algorithm engine'}},{id:'aura',name:'Aura Platform',category:'Audit Management Platform',icon:'⚡',phase:'all',desc:"PwC's global audit ERP used by 100,000+ auditors on every PwC audit. Manages risk assessment, audit planning, controls reliance, and methodology compliance. Connects to Halo analytics and Connect portal.",capabilities:['Risk Assessment','Audit Planning','Controls Testing','Methodology Compliance','Global Standardization','Digital Confirmations'],balances:['All Areas'],industries:['Cross-Industry'],methodology:'Risk-based methodology',aiIntegration:'Embedded Risk Logic',details:{description:"Aura is PwC's cloud-based global audit platform used on every PwC audit worldwide. Serves as the 'audit ERP' — the system of record for building, executing, and documenting the audit plan. Pre-loaded risk libraries help teams identify relevant risks. PwC Confirmation Systems (part of Aura) digitizes the confirmation process.",keyFeatures:['Used on 100% of PwC audits globally','Pre-loaded industry-specific risk libraries','Systematic risk-based approach for consistent methodology','Real-time global audit progress visibility','Integrated with Halo analytics and Connect portal','PwC Confirmation Systems for digital confirmations'],limitations:['Audit management only — no analytics processing','Limited public disclosure on AI capabilities'],aiCapabilities:['Rule-based Risk Logic','Structured Workflow Automation'],coverage:['All Financial Statement Areas'],techStack:'Cloud-based, global multi-tenant architecture'}},{id:'connect',name:'Connect + Extract',category:'Collaboration & Data Tools',icon:'🔗',phase:'all',desc:'Connect provides real-time client collaboration and audit request tracking (PBC lists). Extract automates secure data extraction from client ERP systems. Feed data into Halo analytics.',capabilities:['Client PBC Tracking','Real-time Status','Secure Data Transfer','ERP Extraction','Mobile Access','24/7 Availability'],balances:['N/A — Infrastructure'],industries:['Cross-Industry'],methodology:'Workflow automation',aiIntegration:'Process Automation',details:{description:"Connect is PwC's collaborative workflow tool for information sharing at every audit stage. Available 24/7 from any device. Extract automates pulling data from client ERP systems, saving time and reducing errors. Together they form the data infrastructure feeding Halo analytics.",keyFeatures:['Real-time PBC (provided by client) request tracking','Cross-location global visibility for group audits','Automated notifications and issue flagging','Mobile-ready access for client teams','Secure encrypted data transfer','ERP-agnostic extraction capability'],limitations:['Collaboration/infrastructure tool — limited analytics','Dependent on client IT cooperation for extraction'],aiCapabilities:['Process Automation','Workflow Routing'],coverage:['All Audit Areas'],techStack:'Web-based portal, mobile, API connectors for major ERPs'}}],strengths:['2016 IAB Audit Innovation of the Year','100K+ auditors on Aura','Full-population JE testing at scale','Blockchain/crypto audit capability unique among Big 4','Four tightly integrated platform pillars'],weaknesses:['GenAI adoption less publicized vs KPMG/Deloitte','Four-tool architecture adds complexity','Extract as separate step creates friction'],recentNews:'Ongoing Halo suite expansion with blockchain/crypto extensions. 80M+ journal entries processed globally to date. Developing GenAI capabilities within Halo and Aura.'},{id:'ey',name:'EY',tier:'big4',color:'#c8a800',logo:'EY',flagship:'EY Helix',launched:2017,auditors:'70,000+',countries:'150+',aiLevel:'genai',aiScore:85,breadth:8,desc:"EY Helix is EY's global analytics-driven audit platform with 70,000+ instances deployed globally. Features a comprehensive library of analyzers across the full order-to-cash and procure-to-pay cycles. The EY.ai platform provides the AI integration layer. Academic research cites 89% fraud detection accuracy and audit cycles shortened from 45 to 28 days.",tools:[{id:'helix-core',name:'EY Helix',category:'Global Analytics Platform',icon:'🌀',phase:'all',desc:"EY's global analytics platform embedding analytics into every significant audit area. 70,000+ instances deployed. Features GL Analyzer, Group Scope, Inventory, Trade Payables, and Revenue & Trade Receivables analyzers.",capabilities:['GL Analysis','Revenue Analytics','Payables Testing','Inventory Analysis','Group Scope','Full Population','Order-to-Cash','Procure-to-Pay'],balances:['Journal Entries','Revenue & AR','Trade Payables','Inventory','Equity'],industries:['Cross-Industry','Financial Services','Consumer','Manufacturing','Technology'],methodology:'Analytics-driven audit; full-population + pattern analysis',aiIntegration:'ML Analytics + EY.ai (GenAI developing)',details:{description:"EY Helix is EY's flagship global analytics platform embedded in every audit as a mandatory methodology component. The library includes GL Analyzer (journal entries of any data size), Group Scope Analyzer (multi-entity scope), Inventory Analyzer, Trade Payables Analyzer, and Revenue & Trade Receivables Analyzer (full order-to-cash cycle). EY.ai provides the broader AI platform layer. Academic research validates 89% fraud detection accuracy and 38% audit cycle reduction.",keyFeatures:['GL Analyzer: full-population journal analysis for any data volume','Group Scope Analyzer: multi-entity financial data aggregation for scope strategy','Inventory Analyzer: full-population inventory analysis','Trade Payables Analyzer: end-to-end payables and expense testing','Revenue & Trade Receivables Analyzer: complete order-to-cash cycle analysis','Analytics embedded in global audit methodology — not optional','70,000+ global instances; virtually unlimited data volume capacity','EY.ai platform for ongoing AI capability integration'],limitations:['AI capabilities less publicly disclosed vs KPMG/Deloitte in 2025','Platform narrative split between Helix analytics and EY.ai AI layers'],aiCapabilities:['ML Pattern Detection','Statistical Analytics','EY.ai integration','GenAI (in development)'],coverage:['Journal Entries','Revenue','Trade Receivables','Trade Payables','Inventory','Group Scope'],techStack:'Cloud-based, EY.ai platform, proprietary analytics engine'}},{id:'ey-ai',name:'EY.ai Platform',category:'AI Integration Layer',icon:'🧠',phase:'all',desc:"EY's unified AI platform combining human capabilities and AI across audit and advisory. Provides the AI integration framework above EY Helix. Aims to make every audit analytics-driven while keeping auditor judgment central.",capabilities:['AI Governance','Model Management','GenAI Tooling','Professional Skepticism Enhancement','Standards Research'],balances:['Cross-cutting'],industries:['Cross-Industry'],methodology:'Human-AI collaboration framework',aiIntegration:'Native AI Platform',details:{description:"EY.ai unifies EY's human capabilities with AI, serving as the strategic AI layer across the firm. For audit, it provides the framework for integrating AI into Helix. EY's stated principle: analytics use is always guided by auditor judgment — 'not tools looking for issues, but auditors assessing what data means.' Academic research cites EY AI shortening audit cycles from 45 to 28 days.",keyFeatures:['Unified AI governance and deployment framework','Integration layer connecting GenAI to Helix analytics','Professional skepticism enhancement tools','Audit cycles shortened 38% (45→28 days) via AI','89% fraud detection accuracy cited in academic research'],limitations:['Less detailed public disclosure on specific capabilities','AI governance framework details not fully public'],aiCapabilities:['GenAI','ML','LLMs','AI Governance'],coverage:['Cross-Platform'],techStack:'EY.ai platform, cloud-native, proprietary AI models'}}],strengths:['70K+ global deployments','Analytics mandatory in methodology (not optional)','Comprehensive order-to-cash cycle coverage','EY.ai strategic AI layer','Academic research: 89% fraud detection, 38% cycle reduction'],weaknesses:['Less public GenAI/agentic disclosure vs KPMG/Deloitte in 2025','Platform split between Helix and EY.ai complicates narrative'],recentNews:'Ongoing EY.ai integration with Helix. Academic research cites EY AI systems shortening audit cycles from 45 to 28 days and achieving 89% fraud detection accuracy. 70,000+ instances deployed globally.'},{id:'kpmg',name:'KPMG',tier:'big4',color:'#00338d',logo:'K',flagship:'KPMG Clara',launched:2018,auditors:'95,000+',countries:'140+',aiLevel:'agentic',aiScore:96,breadth:9,desc:"KPMG Clara is widely regarded as the most aggressively AI-integrated audit platform in the Big 4. Built on Microsoft Azure, it integrates GenAI (July 2024), agentic AI agents (April 2025), MindBridge ML transaction scoring, Databricks for billions of transactions, and Microsoft Copilot — deployed to 95,000+ auditors across 140+ countries.",tools:[{id:'clara-core',name:'KPMG Clara',category:'Smart Audit Platform',icon:'🔷',phase:'all',desc:"KPMG's cloud-based global smart audit platform. The most AI-integrated Big 4 platform by public disclosure. Combines collaboration, analytics, workflow, and agentic AI in one environment. Used on every KPMG audit worldwide.",capabilities:['Risk Assessment','Workflow Management','Client Collaboration','Document Analysis','Real-time Dashboards','Agentic Automation','Disclosure Compliance','Walkthrough Automation'],balances:['All Accounts'],industries:['Cross-Industry'],methodology:'Smart audit; risk-based + AI-augmented',aiIntegration:'Full GenAI + Agentic AI',details:{description:"KPMG Clara milestones: 2023 MindBridge alliance for ML Transaction Scoring; June 2024 Databricks integration for billions of transactions; July 2024 GenAI for 90,000 auditors; April 2024 Microsoft Copilot for M365; April 2025 agentic AI for 95,000 auditors. Built on Azure AI Foundry, Azure Cosmos DB, Semantic Kernel, RAG. AI agents automate expense vouching, unrecorded liability searches, and accrued expense management.",keyFeatures:['KPMG Clara Analytics (KCa): deep data-driven analytics with 100% population coverage','KPMG Clara Collaboration (KCc): real-time audit status and secure data sharing','KPMG Clara Workflow (KCw): global audit standards-driven workflow engine','Transaction Scoring (MindBridge): ML analysis of 100% of GL and sub-ledger populations','Audit Chat: 2.175M+ conversations; research, contract extraction, document analysis','GenAI: risk assessment refinement, testing procedure design, documentation','AI Agents: automate expense vouching, URL searches, accrued expense management','FRA AI Engine: financial statement disclosure compliance review','Microsoft Copilot: process narratives and flowcharts from walkthrough meetings','Databricks: billions of financial transactions across thousands of audits'],limitations:['"Human-in-the-loop" required for all AI agent outputs','PCAOB inspection deficiency rate 34% (improving)','Complex multi-vendor AI stack management'],aiCapabilities:['GenAI','Agentic AI','MindBridge ML','RAG','Azure OpenAI','Copilot','Databricks','Semantic Kernel','Cohere'],coverage:['Journal Entries','Revenue','Payables','Inventory','Fixed Assets','Accruals','Disclosures','All Financial Statement Areas'],techStack:'Microsoft Azure, Azure AI Foundry, Azure Cosmos DB, Semantic Kernel, Databricks, MindBridge, Azure OpenAI, Cohere, Copilot'}},{id:'clara-transaction',name:'Transaction Scoring',category:'ML Analytics (MindBridge)',icon:'⚖️',phase:'execution',desc:'MindBridge AI-powered transaction scoring embedded in KPMG Clara. Analyzes 100% of all transactional populations — GL and sub-ledgers — using ML ensemble models to identify outliers, anomalies, and higher-risk items.',capabilities:['100% Population ML Scoring','Outlier Detection','GL Analysis','Sub-ledger Analysis','Risk Ranking','Ensemble Models'],balances:['Journal Entries','All GL Accounts','AP','AR','Payroll','Expense'],industries:['Cross-Industry'],methodology:'ML ensemble; unsupervised anomaly detection',aiIntegration:'ML (MindBridge Embedded)',details:{description:"A multi-year global alliance (2023) embeds MindBridge's AI and ML capabilities directly into KPMG Clara. Transaction Scoring analyzes 100% of transactional populations — not samples — using multiple AI models simultaneously. Each transaction receives a risk score, enabling auditors to focus on highest-risk items efficiently.",keyFeatures:['100% population analysis — no sampling required','Multi-model ML ensemble scoring per transaction','GL and sub-ledger population coverage','Risk-ranked transaction lists for efficient audit focus','Pattern detection across vendor, employee, and transaction data','Integrated directly into KPMG Clara workflow'],limitations:['Requires clean, structured transaction data','ML model interpretability for PCAOB documentation'],aiCapabilities:['MindBridge ML Ensemble','Unsupervised Anomaly Detection','Risk Scoring'],coverage:['Journal Entries','Accounts Payable','Accounts Receivable','Payroll','Expense Reports'],techStack:'MindBridge AI platform embedded in Azure-based Clara'}},{id:'audit-chat',name:'KPMG Audit Chat',category:'GenAI Research & Documentation',icon:'💬',phase:'planning',desc:'GenAI-powered chat for audit research, document extraction, and workflow assistance. 2.175M+ conversations logged since October 2023. Generates process narratives and flowcharts from client meetings via Copilot integration.',capabilities:['Accounting Research','Contract Extraction','Document Summarization','Process Narrative Generation','Flowchart Creation','Standards Research'],balances:['Cross-cutting'],industries:['Cross-Industry'],methodology:'RAG + GenAI',aiIntegration:'Native GenAI (Azure OpenAI + Copilot)',details:{description:"Launched October 2023, KPMG Audit Chat enables auditors to search databases, extract and summarize contract data, analyze documents, and research complex accounting topics. Integrated with Microsoft Copilot for M365, teams transform client walkthrough meetings into structured process narratives and flowcharts automatically.",keyFeatures:['2.175M+ conversations in first year of operation','Contract data extraction and summarization','Complex accounting standards research','Process narrative generation from meeting transcripts','Automated flowchart creation','Integration with KPMG audit methodology knowledge base'],limitations:['Requires auditor review of all outputs','Knowledge base currency dependent on update cycles'],aiCapabilities:['RAG','GenAI','LLMs','NLP','Document Intelligence'],coverage:['All Audit Areas'],techStack:'Azure OpenAI, Microsoft Copilot, RAG, KPMG knowledge base'}}],strengths:['Most aggressively AI-integrated Big 4 platform by public disclosure','MindBridge ML for 100% transaction population scoring','Agentic AI deployed April 2025 to 95K auditors','2.175M Audit Chat conversations in year one','Multi-billion dollar Microsoft alliance','Databricks for billions of cross-engagement transactions'],weaknesses:['PCAOB 34% deficiency rate (improving but elevated)','Complex multi-vendor AI stack management risk','Human-in-the-loop requirement limits full automation'],recentNews:'April 2025: AI agents deployed to 95,000 auditors automating expense vouching, URL searches, and accrued expense review. FRA AI engine for financial statement disclosure compliance added.'},{id:'gt',name:'Grant Thornton',tier:'mid',color:'#6e2585',logo:'GT',flagship:'Lumen + Leap',launched:2019,auditors:'~10,000',countries:'130+',aiLevel:'genai',aiScore:72,breadth:5,desc:"Grant Thornton operates two key platforms: Leap (global assurance technology for all attestation engagements) and Lumen (advanced analytics with predictive modeling and whole-ledger analytics). Positions GT as the analytics leader among mid-tier firms targeting complex middle-market clients.",tools:[{id:'lumen',name:'Lumen Analytics',category:'Audit Analytics Platform',icon:'💡',phase:'execution',desc:"Grant Thornton's advanced analytics platform featuring predictive modeling and whole-ledger analytics. Provides deeper insight than traditional sampling and supports risk-focused audit execution for middle-market clients.",capabilities:['Whole Ledger Analytics','Predictive Modeling','Risk Identification','Full Population Testing','Anomaly Detection','Pattern Recognition'],balances:['Journal Entries','Revenue','Payables','Inventory'],industries:['Cross-Industry','Healthcare','Manufacturing','Technology','Financial Services'],methodology:'Predictive modeling + whole-ledger analysis',aiIntegration:'Predictive ML + Developing GenAI',details:{description:"Lumen is Grant Thornton's analytics platform emphasizing whole-ledger analysis over sampling. Applies predictive modeling to identify risk patterns across the full general ledger population. As a mid-tier firm differentiator, Lumen helps GT compete with Big 4 analytics for complex middle-market clients.",keyFeatures:['Whole-ledger analytics — 100% GL population coverage','Predictive modeling for risk identification','Pattern recognition across transaction populations','Integrated with Leap audit platform','Risk-focused selection for further testing'],limitations:['Less publicly disclosed detail vs Big 4 platforms','Smaller analytics team than Big 4'],aiCapabilities:['Predictive ML','Statistical Analytics'],coverage:['Journal Entries','Revenue','Payables','Inventory'],techStack:'Cloud-based, proprietary analytics engine'}},{id:'leap',name:'Leap Platform',category:'Assurance Technology Platform',icon:'🚀',phase:'all',desc:"Grant Thornton's global assurance technology platform for all attestation engagements. Cloud-based, proprietary platform operationalizing GT's global audit methodology for consistent quality delivery across 130+ countries.",capabilities:['Client Acceptance','Audit Methodology','Workflow Management','Quality Management','Global Consistency','Consultation Workflow'],balances:['All Areas'],industries:['Cross-Industry'],methodology:'Standards-based methodology',aiIntegration:'Workflow Automation',details:{description:"Leap is Grant Thornton's cloud-based global assurance platform covering client acceptance through completion for all assurance and attestation engagements. Operationalizes GT's global audit methodology, ensures consistency across member firms, and integrates with Lumen analytics.",keyFeatures:['End-to-end assurance engagement management','Client acceptance and risk assessment workflows','Global methodology operationalization','Quality management and consultation workflows','Integration with Lumen analytics'],limitations:['Mid-tier scale vs Big 4 platform investment','Limited public AI capability disclosure'],aiCapabilities:['Workflow Automation','Rule-based Risk Logic'],coverage:['All Audit Areas'],techStack:'Cloud-based, proprietary'}}],strengths:['Strong analytics differentiator for mid-tier segment','Whole-ledger predictive modeling via Lumen','Integrated Leap + Lumen platform architecture','AI/RPA roadmap actively in development'],weaknesses:['Significantly smaller investment pool vs Big 4','Limited public GenAI/agentic capability disclosure','Fewer specialist analytics staff'],recentNews:'Actively developing AI capabilities including RPA and ML integration. Transition to "Audit of the Future" framework underway with focus on complex middle-market clients.'},{id:'bdo',name:'BDO',tier:'mid',color:'#e4002b',logo:'B',flagship:'BDO Audit Innovation',launched:2020,auditors:'~8,000',countries:'160+',aiLevel:'genai',aiScore:65,breadth:4,desc:"BDO's multi-million-dollar audit innovation program focuses on AI, blockchain assurance, and real-time auditing. 2025 BDO Audit Innovation Survey: 81% of finance leaders trust firms using advanced tech, 97% willing to pay more. Operating in 160+ countries targeting private and mid-cap public companies.",tools:[{id:'bdo-analytics',name:'BDO Analytics Suite',category:'Audit Analytics',icon:'📈',phase:'execution',desc:"BDO's intelligent automation and advanced analytics for audit engagements. Covers data analytics, AI, and automation for enhanced audit quality. 2025 survey: 93% of finance leaders say auditor technology sophistication now matches their own.",capabilities:['Data Analytics','Intelligent Automation','Risk Identification','Anomaly Detection','Process Automation','Full Population Testing'],balances:['Journal Entries','Revenue','Payables','Inventory'],industries:['Cross-Industry','Private Equity','Real Estate','Financial Services','Manufacturing'],methodology:'Data analytics + automation',aiIntegration:'AI + RPA',details:{description:"BDO's audit innovation program is built on four pillars: advancing technology across the global network; integrating advanced AI; developing blockchain-based assurance; and expanding real-time auditing capabilities. 2025 survey: 63% of finance leaders say technology leads to more efficient processes, up 11 points year-over-year.",keyFeatures:['Advanced analytics for full-population testing','Intelligent automation for routine audit tasks','Risk identification and anomaly detection','Blockchain assurance capabilities in development','Real-time auditing capabilities on roadmap','AI governance framework under development'],limitations:['Less specific platform detail than Big 4','PCAOB inspection deficiency rate a concern in 2025','Data governance confidence declining (46% mature vs 55% in 2024)'],aiCapabilities:['AI Analytics','RPA','Rule-based Automation'],coverage:['Journal Entries','Revenue','Payables','Inventory'],techStack:'Cloud-based, vendor analytics tools, AI integrations'}}],strengths:['160+ country network (broadest mid-tier reach)','Rapid technology investment growth','Strong private company/PE market focus','Finance leader trust scores rising (81%)','97% client willingness to pay more for tech-enabled audit'],weaknesses:['PCAOB deficiency rate concerns','Less mature AI platform vs Big 4','Data governance confidence declining in 2025 survey'],recentNews:'2025 BDO Audit Innovation Survey: 97% of finance leaders willing to pay more for technology-enabled audits. Blockchain-based assurance and real-time auditing on near-term roadmap. Multi-million dollar innovation commitment confirmed.'},{id:'rsm',name:'RSM',tier:'mid',color:'#005eb8',logo:'R',flagship:'RSM Digital Audit',launched:2020,auditors:'~5,000',countries:'120+',aiLevel:'genai',aiScore:60,breadth:4,desc:"RSM's middle-market focused digital audit approach combines data analytics, AI, and technology for complex middle-market and PE-backed clients. Positions its analytics advantage specifically for companies that Big 4 firms under-serve with premium analytics resources.",tools:[{id:'rsm-digital',name:'RSM Digital Audit',category:'Analytics-Enabled Audit',icon:'🔍',phase:'execution',desc:"RSM's analytics-driven audit for middle-market clients. Full-population GL and transaction analysis with industry-specific models for manufacturing, distribution, real estate, technology, and PE-backed companies.",capabilities:['Data Analytics','Middle-Market Analytics','Private Equity Audit','Revenue Testing','GL Analysis','Industry Models'],balances:['Journal Entries','Revenue','Payables','Inventory'],industries:['Manufacturing','Distribution','Technology','Real Estate','Healthcare','Private Equity'],methodology:'Risk-based analytics for middle market',aiIntegration:'AI Analytics Tools',details:{description:"RSM positions its digital audit capabilities specifically for the middle market, arguing that Big 4 firms concentrate best analytics on Fortune 500. RSM's analytics analyze full transaction populations for revenue, payables, and JEs while providing industry-specific risk models. Deep PE and owner-managed business expertise.",keyFeatures:['Middle-market focused analytics models','Full-population GL and transaction analysis','Industry-specific risk scoring','Private equity and owner-managed business expertise','Cross-industry analytics benchmarking'],limitations:['Smaller scale vs Big 4 investment','Limited public platform detail'],aiCapabilities:['Analytics Tools','Statistical Analysis'],coverage:['Journal Entries','Revenue','Payables','Inventory'],techStack:'Cloud-based analytics, third-party tool integrations'}}],strengths:['Middle-market specialization — clear positioning','Deep PE and private company expertise','Growing analytics investment','Less competitive pressure vs Big 4 in middle market'],weaknesses:['Limited public platform disclosure','Smaller analytics team','Platform maturity well behind Big 4'],recentNews:'Continuing investment in digital audit capabilities with focus on serving complex middle-market clients with Big 4-quality analytics at appropriate scale.'},{id:'crowe',name:'Crowe',tier:'mid',color:'#009a44',logo:'C',flagship:'Crowe Specialty Analytics',launched:2019,auditors:'~4,000',countries:'145+',aiLevel:'genai',aiScore:55,breadth:3,desc:"Crowe LLP specializes in industry-specific analytics for financial services, banking, insurance, and healthcare. Deep sector expertise in BSA/AML compliance analytics, insurance reserve testing, CECL modeling, and healthcare revenue cycle analytics differentiates Crowe in regulated industries.",tools:[{id:'crowe-analytics',name:'Crowe Specialty Analytics',category:'Industry-Specific Analytics',icon:'🏦',phase:'execution',desc:"Crowe's analytics platform specializing in financial services, banking, and insurance. Covers BSA/AML analytics, insurance reserve testing, loan loss (CECL) analysis, and healthcare revenue cycle. Sector depth over breadth.",capabilities:['Banking Analytics','Insurance Analytics','BSA/AML','CECL/Loan Loss','Insurance Reserves','Healthcare Revenue','Government Fund'],balances:['Loans','Insurance Reserves','Revenue','Allowances','Regulatory Capital','BSA Transactions'],industries:['Banking','Insurance','Healthcare','Government','Financial Services'],methodology:'Industry-specific risk analytics',aiIntegration:'AI Analytics + Sector-Specific ML Models',details:{description:"Crowe differentiates on deep industry specialization over platform breadth. In banking: loan portfolio analytics, CECL modeling, BSA/AML transaction testing, regulatory capital analysis. In insurance: reserve adequacy, loss ratio testing, reinsurance analytics. Healthcare: revenue cycle, cost report testing, compliance.",keyFeatures:['Bank loan portfolio full-population analysis','CECL allowance model testing and validation','BSA/AML transaction pattern analytics','Insurance reserve adequacy analytics','Healthcare revenue cycle testing','Government fund accountability analytics'],limitations:['Narrow industry focus — not strong in manufacturing/retail/tech','Smaller platform investment overall','Limited GenAI capability disclosure'],aiCapabilities:['Sector ML Models','Statistical Analytics','BSA/AML Pattern Detection'],coverage:['Loans','Reserves','BSA/AML Transactions','Revenue','Insurance Liabilities'],techStack:'Cloud analytics, sector-specific ML models'}}],strengths:['Deep financial services specialization — clear differentiator','BSA/AML analytics leader among mid-tier firms','Insurance and banking sector depth','Healthcare analytics capability','Serves heavily regulated industries well'],weaknesses:['Narrow industry focus limits cross-sector applicability','Lower public AI maturity vs Big 4 and GT','Smallest analytics breadth in tracked set'],recentNews:'Continuing investment in financial services analytics and AI-powered BSA/AML transaction monitoring. CECL modeling capabilities expanding for banking clients.'}];
 
-const FIRMS = [
-  {
-    id: 'deloitte',
-    name: 'Deloitte',
-    tier: 'big4',
-    color: '#86bc25',
-    logo: 'D',
-    flagship: 'Omnia',
-    launched: 2015,
-    auditors: '85,000+',
-    countries: '150+',
-    aiLevel: 'agentic',
-    aiScore: 94,
-    breadth: 9,
-    desc: 'Deloitte\'s Omnia platform — launched in 2015 and winner of the 2024 IAF AI Innovation Initiative of the Year — has evolved into a full GenAI and agentic AI platform serving 85,000+ audit professionals globally. The July 2025 expansion added documentation review, financial statement navigation, and autonomous agent networks.',
-    tools: [
-      {
-        id: 'omnia-core',
-        name: 'Omnia Platform',
-        category: 'Core Audit Platform',
-        icon: '⚙️',
-        phase: 'all',
-        desc: 'Cloud-based global audit and assurance platform. The engine powering all Deloitte audits. Provides end-to-end workflow, risk assessment, project tracking, and client collaboration in a unified environment.',
-        capabilities: ['Risk Assessment','JE Analytics','GL Population Testing','Real-time Dashboards','SOX Workflow','Client Portal'],
-        balances: ['All Accounts'],
-        industries: ['Cross-Industry'],
-        methodology: 'Risk-based full-population',
-        aiIntegration: 'Full GenAI + Agentic',
-        details: {
-          description: 'Omnia is Deloitte\'s flagship global audit platform, deployed on every Deloitte audit worldwide. Since its 2015 launch it has continuously integrated new AI capabilities. The July 2025 release brought GenAI documentation review, financial statement navigation, data extraction summarization, memo drafting, and research acceleration. An agentic AI layer now allows autonomous agents to gather data from diverse sources, manage project plans, and detect transaction anomalies.',
-          keyFeatures: [
-            'GenAI-powered documentation review with clarity/consistency suggestions',
-            'Natural language navigation of uploaded draft financial statements',
-            'Cross-document data extraction and summarization via GenAI',
-            'First-draft generation for audit communications and accounting memos',
-            'Intelligent research assistant for complex accounting/auditing topics',
-            'AI agents that autonomously gather, compare and analyze data from diverse sources',
-            'Real-time cloud dashboards for project plan tracking and milestone management',
-            'Trustworthy AI™ framework with governance and compliance controls throughout'
-          ],
-          limitations: [
-            'Proprietary platform - no external access',
-            'Agent capabilities still in phased rollout',
-            'Human review required on all AI-generated outputs'
-          ],
-          aiCapabilities: ['GenAI','Agentic AI','LLMs','RAG','Document Intelligence'],
-          coverage: ['Journal Entries','Revenue','Payables','Inventory','Fixed Assets','Equity','Cash','Derivatives'],
-          techStack: 'Cloud-native, Azure, Trustworthy AI framework, Databricks'
-        }
-      },
-      {
-        id: 'omnia-data',
-        name: 'Omnia|Data Analytics',
-        category: 'Data Analytics Suite',
-        icon: '📊',
-        phase: 'execution',
-        desc: 'Deloitte\'s specialized analytics layer within Omnia. Handles journal entry risk scoring, vendor master file analysis, substantive analytical procedures, and industry-specific analytics across Databricks/Azure infrastructure.',
-        capabilities: ['JE Risk Scoring','Vendor Analytics','Statistical SAPs','Outlier Detection','Full Population','Visualization'],
-        balances: ['Journal Entries','Revenue','Payables','Cash'],
-        industries: ['Cross-Industry','Financial Services','Manufacturing','Utilities'],
-        methodology: 'Statistical + ML scoring',
-        aiIntegration: 'ML + GenAI Overlay',
-        details: {
-          description: 'The Omnia|Data Analytics capability (internally known as the "DA Specialist" function) delivers structured analytics notebooks and pipelines for specific audit procedures. Built on Databricks/PySpark/Azure with Unity Catalog, this team produces bespoke analytics including JE classification frameworks, GL risk scoring with weighted multi-factor models, and CDM (Common Data Model) pipeline development. Journal entry testing covers full-population analysis with risk scoring models identifying unusual timing, unusual users, and unusual amounts.',
-          keyFeatures: [
-            'Journal entry full-population testing with weighted risk scoring',
-            'Vendor master file and conflict-of-interest analytics',
-            'Revenue prediction and substantive analytical procedures',
-            'Close optimization pipeline and dashboard analytics',
-            'EBP, oil & gas, utility, and industry-specific modules',
-            'Integration with Deloitte Cortex platform for automated reporting',
-            'DARTbot - GenAI tool for complex accounting research',
-            'Databricks-native execution with Unity Catalog governance'
-          ],
-          limitations: [
-            'Engagement-specific configuration required',
-            'Specialist team separate from core audit staff',
-            'Tool maturity varies by industry module'
-          ],
-          aiCapabilities: ['ML Scoring','GenAI (DARTbot)','NLP','spaCy NER','Predictive Analytics'],
-          coverage: ['Journal Entries','Revenue','Payables','Inventory','Fixed Assets','Utilities','EBP','Derivatives'],
-          techStack: 'Databricks, PySpark, Azure, Unity Catalog, Python, Anthropic Claude API'
-        }
-      },
-      {
-        id: 'dartbot',
-        name: 'DARTbot',
-        category: 'AI Research Tool',
-        icon: '🤖',
-        phase: 'planning',
-        desc: 'Internal GenAI chatbot for Audit & Assurance professionals. Enables efficient research on complex accounting and auditing topics. Processed 3M+ prompts in its first year of deployment.',
-        capabilities: ['Accounting Research','Standards Q&A','Audit Guidance','Memo Drafting'],
-        balances: ['N/A - Research Tool'],
-        industries: ['Cross-Industry'],
-        methodology: 'RAG + LLM',
-        aiIntegration: 'Native GenAI',
-        details: {
-          description: 'DARTbot is Deloitte\'s internal GenAI tool that empowers Audit & Assurance professionals to more efficiently research complex accounting and auditing topics. Grounded in authoritative accounting literature and PCAOB/AICPA standards, it provides fast, contextual answers to complex technical questions. Part of Deloitte\'s broader AI Academy investment covering 120,000+ professionals.',
-          keyFeatures: [
-            'Natural language access to accounting standards (GAAP, IFRS, PCAOB)',
-            'Contextual memo drafting assistance',
-            'Real-time standards interpretation',
-            '3M+ prompts processed in first deployment year'
-          ],
-          limitations: ['Internal use only', 'Not a substitute for professional judgment'],
-          aiCapabilities: ['RAG','LLM','Natural Language Search'],
-          coverage: ['All Financial Statement Areas'],
-          techStack: 'Proprietary LLM, RAG, internal knowledge bases'
-        }
-      }
-    ],
-    strengths: ['Longest-running platform (since 2015)', 'Winner IAF AI Innovation Award 2024', 'Full agentic AI roadmap', '85K+ professionals trained', 'Databricks/Azure native stack'],
-    weaknesses: ['Specialist team separation from core audit', 'Agent rollout still phased'],
-    recentNews: 'July 2025: Announced full GenAI and agentic AI expansion in Omnia, including AI agent networks and Trustworthy AI™ framework. Recognized as inaugural AI Innovation Initiative of the Year by IAF Awards 2024.'
-  },
+let currentFirm=null,currentTool=null,filters={tier:‘all’,ai:‘all’};
 
-  {
-    id: 'pwc',
-    name: 'PwC',
-    tier: 'big4',
-    color: '#d04a02',
-    logo: 'P',
-    flagship: 'Halo',
-    launched: 2016,
-    auditors: '100,000+',
-    countries: '158',
-    aiLevel: 'genai',
-    aiScore: 88,
-    breadth: 8,
-    desc: 'PwC\'s Halo suite — winner of the 2016 IAB Audit Innovation of the Year — is a multi-tiered analytics platform for data extraction, visualization, and auditing. Combined with the Aura audit management platform, Connect collaboration, and Extract data tool, it forms the "four pillars" of the PwC digital audit.',
-    tools: [
-      {
-        id: 'halo-core',
-        name: 'Halo Suite',
-        category: 'Data Analytics & Visualization',
-        icon: '🔵',
-        phase: 'execution',
-        desc: 'PwC\'s award-winning data extraction, visualization, and auditing platform. Tests entire populations of data, applies advanced algorithms to identify outliers and higher-risk transactions, and delivers visual risk dashboards.',
-        capabilities: ['Full Population Testing','Risk Visualization','JE Analysis','Anomaly Detection','Trend Analysis','Ratio Analysis'],
-        balances: ['Journal Entries','Revenue','Payables','Inventory','Cash','Fixed Assets'],
-        industries: ['Cross-Industry','Financial Services','Manufacturing','Retail','Energy'],
-        methodology: 'Algorithm-based population analytics',
-        aiIntegration: 'ML Algorithms + Developing GenAI',
-        details: {
-          description: 'Halo is PwC\'s leading-edge data extraction, auditing, and visualization platform. Originally launched as "Halo for Journals" in 2016 (winning the IAB Audit Innovation of the Year), it has expanded to cover revenue, payables, inventory, and more. The platform works with any ERP system at any scale — from single-ledger companies to organizations with tens of millions of journal entries. It has processed over 80 million journal entries globally. Key modules include Halo for Journals (JE analysis), Halo for Revenue, and Halo for Fixed Assets.',
-          keyFeatures: [
-            'Full population journal entry testing — not sampling',
-            'Color-coded visual dashboards (red/yellow/green risk indicators)',
-            'Drill-down from aggregate to individual transaction level',
-            'Automated ratio and trend analysis using audit data',
-            'Multi-hosted server architecture for secure client data handling',
-            'Cryptocurrency/blockchain transaction tracking capability',
-            'Extract module for automated, standardized data extraction',
-            'Works with SAP, Oracle, and all major ERP systems'
-          ],
-          limitations: [
-            'GenAI capabilities still developing vs KPMG/Deloitte',
-            'Separate Extract step adds process complexity',
-            'Visual dashboards require analyst interpretation'
-          ],
-          aiCapabilities: ['Statistical Algorithms','Anomaly Detection','ML Scoring','Visualization AI'],
-          coverage: ['Journal Entries','Revenue','Fixed Assets','Inventory','Payables','Treasury','Blockchain/Crypto'],
-          techStack: 'Multi-tiered server architecture, cloud-hosted, proprietary algorithms'
-        }
-      },
-      {
-        id: 'aura',
-        name: 'Aura Platform',
-        category: 'Audit Management Platform',
-        icon: '⚡',
-        phase: 'all',
-        desc: 'PwC\'s global audit ERP used by 100,000+ auditors worldwide on every PwC audit. Manages risk assessment, audit planning, controls reliance decisions, and methodology compliance. Cloud-based.',
-        capabilities: ['Risk Assessment','Audit Planning','Controls Testing','Methodology Compliance','Global Standardization'],
-        balances: ['All Areas'],
-        industries: ['Cross-Industry'],
-        methodology: 'Risk-based methodology',
-        aiIntegration: 'Embedded Risk Logic',
-        details: {
-          description: 'Aura is PwC\'s global cloud-based audit platform used on every single PwC audit worldwide. It serves as the "audit ERP" — the system of record for building, executing, and documenting the audit plan. Pre-loaded risk libraries help teams identify relevant risks and perform targeted testing. Aura connects to Halo analytics, the Connect collaboration portal, and Extract data tools to form a fully integrated audit ecosystem. PwC Confirmation Systems (part of Aura) digitizes the confirmation process.',
-          keyFeatures: [
-            'Used on 100% of PwC audits globally',
-            'Pre-loaded industry-specific risk libraries',
-            'Systematic risk-based approach for consistent methodology',
-            'Real-time global audit progress visibility',
-            'Integrated with Halo analytics and Connect portal',
-            'PwC Confirmation Systems for digital confirmations',
-            'Supports both local and group audit execution'
-          ],
-          limitations: ['Audit management only — no analytics processing', 'Limited public detail on AI capabilities'],
-          aiCapabilities: ['Rule-based Risk Logic','Structured Workflow Automation'],
-          coverage: ['All Financial Statement Areas'],
-          techStack: 'Cloud-based, global multi-tenant architecture'
-        }
-      },
-      {
-        id: 'connect',
-        name: 'Connect + Extract',
-        category: 'Collaboration & Data Tools',
-        icon: '🔗',
-        phase: 'all',
-        desc: 'Connect provides real-time client collaboration and audit request tracking. Extract automates secure data extraction from client ERP systems. Together they streamline data gathering and communication throughout the audit.',
-        capabilities: ['Client PBC Tracking','Real-time Status','Secure Data Transfer','ERP Extraction','Mobile Access'],
-        balances: ['N/A - Infrastructure'],
-        industries: ['Cross-Industry'],
-        methodology: 'Workflow automation',
-        aiIntegration: 'Process Automation',
-        details: {
-          description: 'Connect is PwC\'s collaborative workflow tool providing fast, efficient, secure information sharing at every audit stage. Available 24/7 from any device. Extract automates the often-manual process of pulling data from client ERP systems, saving time and reducing errors. Together they form the infrastructure layer that feeds data into Halo analytics.',
-          keyFeatures: [
-            'Real-time audit request tracking (PBC lists)',
-            'Cross-location global visibility',
-            'Automated notifications and issue flagging',
-            'Mobile-ready access for client teams',
-            'Secure data transfer with encryption',
-            'ERP-agnostic extraction capability'
-          ],
-          limitations: ['Collaboration tool — limited analytics', 'Dependent on client IT cooperation for data extraction'],
-          aiCapabilities: ['Process Automation','Workflow Routing'],
-          coverage: ['All Audit Areas'],
-          techStack: 'Web-based portal, mobile, API connectors'
-        }
-      }
-    ],
-    strengths: ['2016 IAB Audit Innovation of the Year', '100K+ auditors on Aura', 'Full-population JE testing at scale', 'Blockchain/crypto audit capability', 'Four integrated platform pillars'],
-    weaknesses: ['GenAI adoption lags KPMG/Deloitte per public disclosure', 'Platform architecture more complex (4 tools)'],
-    recentNews: 'Ongoing investment in Halo suite expansion. Blockchain/crypto extensions added. 80M+ journal entries processed globally to date.'
-  },
-
-  {
-    id: 'ey',
-    name: 'EY',
-    tier: 'big4',
-    color: '#ffe600',
-    logo: 'EY',
-    flagship: 'EY Helix',
-    launched: 2017,
-    auditors: '70,000+',
-    countries: '150+',
-    aiLevel: 'genai',
-    aiScore: 85,
-    breadth: 8,
-    desc: 'EY Helix is EY\'s global analytics-driven audit platform with 70,000+ instances deployed globally. Featuring a comprehensive library of analyzers across the full order-to-cash and procure-to-pay cycles, Helix embeds analytics into every significant aspect of the audit from risk assessment through execution.',
-    tools: [
-      {
-        id: 'helix-core',
-        name: 'EY Helix',
-        category: 'Global Analytics Platform',
-        icon: '🌀',
-        phase: 'all',
-        desc: 'EY\'s global analytics platform enabling analytics to be embedded into every significant aspect of the audit. Features a comprehensive library of analyzers covering different industries and audit areas worldwide. 70,000+ instances deployed.',
-        capabilities: ['GL Analysis','Revenue Analytics','Payables Testing','Inventory Analysis','Group Scope','Full Population'],
-        balances: ['Journal Entries','Revenue & AR','Trade Payables','Inventory','Equity'],
-        industries: ['Cross-Industry','Financial Services','Consumer','Manufacturing','Technology'],
-        methodology: 'Analytics-driven audit; full-population + pattern analysis',
-        aiIntegration: 'ML Analytics + EY.ai Platform + GenAI developing',
-        details: {
-          description: 'EY Helix is EY\'s flagship global analytics platform, designed to make every audit analytics-driven. The EY Helix library contains analytics developed from around the globe covering different industries and audit areas. Key modules include: GL Analyzer (journal entry analysis of any data size), Group Scope Analyzer (financial data aggregation for multi-entity scope), Inventory Analyzer, Trade Payables Analyzer, and Revenue & Trade Receivables Analyzer. EY.ai provides the broader AI platform layer enabling continued AI integration.',
-          keyFeatures: [
-            'GL Analyzer: full-population GL journal analysis for any data size',
-            'Group Scope Analyzer: multi-entity financial data aggregation for scope strategy',
-            'Inventory Analyzer: full-population inventory analysis',
-            'Trade Payables Analyzer: end-to-end payables and expense testing',
-            'Revenue & Trade Receivables Analyzer: complete order-to-cash cycle analysis',
-            'Embedded in global audit methodology — not optional',
-            '70,000+ global instances; handles virtually unlimited data volume',
-            'EY.ai platform for ongoing AI capability integration'
-          ],
-          limitations: [
-            'AI capabilities less publicly detailed than KPMG/Deloitte in 2025',
-            'Platform split: EY.ai AI layer separate from Helix analytics layer'
-          ],
-          aiCapabilities: ['ML Pattern Detection','Statistical Analytics','EY.ai integration','GenAI (in development)'],
-          coverage: ['Journal Entries','Revenue','Trade Receivables','Trade Payables','Inventory','Group Scope'],
-          techStack: 'Cloud-based, EY.ai platform, proprietary analytics engine'
-        }
-      },
-      {
-        id: 'ey-ai',
-        name: 'EY.ai',
-        category: 'AI Platform',
-        icon: '🧠',
-        phase: 'all',
-        desc: 'EY\'s unified AI platform combining human capabilities and artificial intelligence to drive AI adoption across audit and advisory. Forms the AI layer above EY Helix analytics.',
-        capabilities: ['AI Governance','Model Management','GenAI Tooling','Professional Skepticism AI'],
-        balances: ['Cross-cutting'],
-        industries: ['Cross-Industry'],
-        methodology: 'Human-AI collaboration',
-        aiIntegration: 'Native AI Platform',
-        details: {
-          description: 'EY.ai unifies EY\'s human capabilities with artificial intelligence, serving as the strategic AI layer across the firm. For audit, it provides the framework for integrating AI into Helix and other audit tools. The platform emphasizes that AI use is always guided by auditor judgment — "not about tools looking for issues, but about auditors assessing what the data means."',
-          keyFeatures: [
-            'Unified AI governance and deployment framework',
-            'Integration layer connecting GenAI to Helix analytics',
-            'Professional skepticism enhancement tools',
-            'EY audit cycle shortened from 45 to 28 days via AI (per academic research)'
-          ],
-          limitations: ['Less detailed public disclosure on specific capabilities'],
-          aiCapabilities: ['GenAI','ML','LLMs','AI Governance'],
-          coverage: ['Cross-Platform'],
-          techStack: 'EY.ai platform, cloud-native, proprietary AI models'
-        }
-      }
-    ],
-    strengths: ['70K+ global deployments', 'Analytics embedded in methodology (mandatory)', 'Comprehensive order-to-cash cycle coverage', 'EY.ai strategic AI layer', 'Academic research validates 89% fraud detection accuracy'],
-    weaknesses: ['Less public GenAI/agentic disclosure vs Deloitte/KPMG in 2025', 'Platform narrative split between Helix and EY.ai'],
-    recentNews: 'Ongoing EY.ai integration with Helix. Academic research cites EY AI systems shortening audit cycles from 45 to 28 days and achieving 89% fraud detection accuracy.'
-  },
-
-  {
-    id: 'kpmg',
-    name: 'KPMG',
-    tier: 'big4',
-    color: '#00338d',
-    logo: 'K',
-    flagship: 'KPMG Clara',
-    launched: 2018,
-    auditors: '95,000+',
-    countries: '140+',
-    aiLevel: 'agentic',
-    aiScore: 96,
-    breadth: 9,
-    desc: 'KPMG Clara is widely regarded as the most aggressively AI-enabled audit platform in the industry. Built on Microsoft Azure, it integrates GenAI (July 2024), agentic AI agents (April 2025), MindBridge ML transaction scoring, Databricks analytics, and Microsoft Copilot — serving 95,000+ auditors across 140+ countries.',
-    tools: [
-      {
-        id: 'clara-core',
-        name: 'KPMG Clara',
-        category: 'Smart Audit Platform',
-        icon: '🔷',
-        phase: 'all',
-        desc: 'KPMG\'s cloud-based global smart audit platform. The most AI-integrated audit platform in the Big 4. Combines collaboration, analytics, workflow, and now agentic AI in a single environment. Used on every KPMG audit worldwide.',
-        capabilities: ['Risk Assessment','Workflow Management','Client Collaboration','Document Analysis','Real-time Dashboards','Agentic Automation'],
-        balances: ['All Accounts'],
-        industries: ['Cross-Industry'],
-        methodology: 'Smart audit; risk-based + AI-augmented',
-        aiIntegration: 'Full GenAI + Agentic AI',
-        details: {
-          description: 'KPMG Clara is the most advanced AI-integrated audit platform among the Big 4 by public disclosure. Key milestones: 2023 MindBridge alliance for ML Transaction Scoring; June 2024 Databricks integration for billions of transactions; July 2024 GenAI integration for 90,000 auditors; April 2024 Microsoft Copilot for M365; April 2025 agentic AI deployment for 95,000 auditors. Built on Microsoft Azure using Azure AI Foundry, Azure Cosmos DB, Semantic Kernel, and RAG. Processes audit documentation, refines risk assessments, and automates routine procedures through AI agents.',
-          keyFeatures: [
-            'KPMG Clara Analytics (KCa): deep data-driven analytics with 100% population coverage',
-            'KPMG Clara Collaboration (KCc): real-time audit status and secure data sharing',
-            'KPMG Clara Workflow (KCw): global audit standards-driven workflow engine',
-            'Transaction Scoring (MindBridge): ML analysis of 100% of GL and sub-ledger populations',
-            'Audit Chat: 2.175M+ conversations for research, contract extraction, document analysis',
-            'GenAI: risk assessment refinement, testing procedure design, documentation',
-            'AI Agents: automate expense vouching, URL searches, accrued expense management',
-            'FRA AI Engine: financial statement disclosure compliance review',
-            'Microsoft Copilot integration for process narratives and flowcharts',
-            'Databricks integration for billions of financial transactions across thousands of audits'
-          ],
-          limitations: [
-            '"Human-in-the-loop" required for all AI agent outputs',
-            'PCAOB inspection deficiency rate still 34% (improving but above target)',
-            'Complexity of multi-vendor AI stack'
-          ],
-          aiCapabilities: ['GenAI','Agentic AI','MindBridge ML','RAG','Azure OpenAI','Copilot','Databricks','Semantic Kernel'],
-          coverage: ['Journal Entries','Revenue','Payables','Inventory','Fixed Assets','Accruals','Disclosures','All Financial Statement Areas'],
-          techStack: 'Microsoft Azure, Azure AI Foundry, Azure Cosmos DB, Semantic Kernel, Databricks, MindBridge, Cohere, Copilot'
-        }
-      },
-      {
-        id: 'clara-transaction',
-        name: 'Transaction Scoring',
-        category: 'ML Analytics (MindBridge)',
-        icon: '⚖️',
-        phase: 'execution',
-        desc: 'MindBridge AI-powered transaction scoring embedded in KPMG Clara. Analyzes 100% of all transactional populations — GL and sub-ledgers — using ML to identify outliers, anomalies, and higher-risk items.',
-        capabilities: ['100% Population ML Scoring','Outlier Detection','GL Analysis','Sub-ledger Analysis','Risk Ranking'],
-        balances: ['Journal Entries','All GL Accounts','Sub-ledgers'],
-        industries: ['Cross-Industry'],
-        methodology: 'ML-based risk scoring; unsupervised anomaly detection',
-        aiIntegration: 'ML (MindBridge)',
-        details: {
-          description: 'A multi-year global alliance between KPMG and MindBridge (announced 2023) embeds MindBridge\'s AI and ML capabilities directly into KPMG Clara. Transaction Scoring analyzes 100% of transactional populations — not samples — using multiple AI models simultaneously. Each transaction receives a risk score, enabling auditors to focus on the highest-risk items.',
-          keyFeatures: [
-            '100% population analysis — no sampling required',
-            'Multi-model ML ensemble scoring per transaction',
-            'GL and sub-ledger population coverage',
-            'Risk-ranked transaction lists for efficient audit focus',
-            'Pattern detection across vendor, employee, and transaction data',
-            'Integrated directly into KPMG Clara workflow'
-          ],
-          limitations: ['Requires clean, structured transaction data', 'ML model interpretability for PCAOB documentation'],
-          aiCapabilities: ['MindBridge ML','Ensemble Models','Unsupervised Anomaly Detection','Risk Scoring'],
-          coverage: ['Journal Entries','Accounts Payable','Accounts Receivable','Payroll','Expense Reports'],
-          techStack: 'MindBridge AI, embedded in Azure-based Clara platform'
-        }
-      },
-      {
-        id: 'audit-chat',
-        name: 'KPMG Audit Chat',
-        category: 'GenAI Research & Documentation',
-        icon: '💬',
-        phase: 'planning',
-        desc: 'GenAI-powered chat tool for audit research, document extraction, and workflow assistance. Over 2.175 million conversations logged. Generates process narratives and flowcharts from client meetings using Copilot.',
-        capabilities: ['Accounting Research','Contract Extraction','Document Summarization','Process Narrative Generation','Flowchart Creation'],
-        balances: ['Cross-cutting'],
-        industries: ['Cross-Industry'],
-        methodology: 'RAG + GenAI',
-        aiIntegration: 'Native GenAI',
-        details: {
-          description: 'Launched October 2023, KPMG Audit Chat enables auditors to search databases, extract and summarize data from contracts, analyze documents, and research complex accounting and auditing topics. Integrated with Microsoft Copilot for M365, teams use it to transform client walkthrough meetings into structured process narratives and flowcharts automatically.',
-          keyFeatures: [
-            '2.175M+ conversations in first year of operation',
-            'Contract data extraction and summarization',
-            'Complex accounting standards research',
-            'Process narrative generation from meeting transcripts',
-            'Automated flowchart creation',
-            'Integration with KPMG audit methodology knowledge base'
-          ],
-          limitations: ['Requires auditor review of all outputs', 'Knowledge base currency dependent on update cycles'],
-          aiCapabilities: ['RAG','GenAI','LLMs','NLP','Document Intelligence'],
-          coverage: ['All Audit Areas'],
-          techStack: 'Azure OpenAI, Microsoft Copilot, RAG, KPMG knowledge base'
-        }
-      }
-    ],
-    strengths: ['Most aggressively AI-integrated Big 4 platform', 'MindBridge ML for 100% transaction scoring', 'Agentic AI deployed April 2025', '2.175M Audit Chat conversations', 'Multi-billion dollar Microsoft alliance', 'Databricks for billions of transactions'],
-    weaknesses: ['PCAOB 34% deficiency rate (improving)', 'Complex multi-vendor stack risks', 'Human-in-the-loop requirement slows full automation'],
-    recentNews: 'April 2025: Launched AI agents in KPMG Clara for 95,000 auditors. Agents automate expense vouching, URL searches, and accrued expense review. FRA AI engine for disclosure compliance added.'
-  },
-
-  {
-    id: 'gt',
-    name: 'Grant Thornton',
-    tier: 'mid',
-    color: '#6e2585',
-    logo: 'GT',
-    flagship: 'Lumen + Leap',
-    launched: 2019,
-    auditors: '~10,000',
-    countries: '130+',
-    aiLevel: 'genai',
-    aiScore: 72,
-    breadth: 5,
-    desc: 'Grant Thornton operates two key platforms: Leap (global assurance technology for all attestation engagements) and Lumen (advanced analytics with predictive modeling and whole-ledger analytics). The combination positions GT as the analytics leader among mid-tier firms.',
-    tools: [
-      {
-        id: 'lumen',
-        name: 'Lumen Analytics',
-        category: 'Audit Analytics Platform',
-        icon: '💡',
-        phase: 'execution',
-        desc: 'Grant Thornton\'s advanced analytics platform featuring predictive modeling and whole-ledger analytics. Provides deeper insight than traditional sampling approaches and supports risk-focused audit execution.',
-        capabilities: ['Whole Ledger Analytics','Predictive Modeling','Risk Identification','Full Population Testing','Anomaly Detection'],
-        balances: ['Journal Entries','Revenue','Payables','Inventory'],
-        industries: ['Cross-Industry','Healthcare','Manufacturing','Technology'],
-        methodology: 'Predictive modeling + whole-ledger analysis',
-        aiIntegration: 'Predictive ML + Developing GenAI',
-        details: {
-          description: 'Lumen is Grant Thornton\'s analytics platform emphasizing whole-ledger analysis rather than sampling. It applies predictive modeling to identify risk patterns across the full general ledger population. As a mid-tier firm differentiator, Lumen helps GT compete with Big 4 analytics capabilities for its target client segments.',
-          keyFeatures: [
-            'Whole-ledger analytics — 100% GL population coverage',
-            'Predictive modeling for risk identification',
-            'Pattern recognition across transaction populations',
-            'Integrated with Leap audit platform',
-            'Risk-focused selection of items for further testing'
-          ],
-          limitations: ['Less publicly disclosed detail vs Big 4 platforms', 'Smaller analytics team than Big 4'],
-          aiCapabilities: ['Predictive ML','Statistical Analytics'],
-          coverage: ['Journal Entries','Revenue','Payables','Inventory'],
-          techStack: 'Cloud-based, proprietary analytics engine'
-        }
-      },
-      {
-        id: 'leap',
-        name: 'Leap Platform',
-        category: 'Assurance Technology Platform',
-        icon: '🚀',
-        phase: 'all',
-        desc: 'Grant Thornton\'s global assurance technology platform for all attestation engagements. Cloud-based, proprietary platform that operationalizes GT\'s global audit methodology and enables consistent quality delivery worldwide.',
-        capabilities: ['Client Acceptance','Audit Methodology','Workflow Management','Quality Management','Global Consistency'],
-        balances: ['All Areas'],
-        industries: ['Cross-Industry'],
-        methodology: 'Standards-based methodology',
-        aiIntegration: 'Workflow Automation',
-        details: {
-          description: 'Leap is Grant Thornton\'s global cloud-based assurance platform covering client acceptance through completion for all assurance and attestation engagements. The proprietary platform operationalizes GT\'s global audit methodology, ensures consistency across member firms, and integrates with Lumen analytics.',
-          keyFeatures: [
-            'End-to-end assurance engagement management',
-            'Client acceptance and risk assessment workflows',
-            'Global methodology operationalization',
-            'Quality management and consultation workflows',
-            'Integration with Lumen analytics'
-          ],
-          limitations: ['Mid-tier scale vs Big 4 platform investment', 'Limited public AI capability disclosure'],
-          aiCapabilities: ['Workflow Automation','Rule-based Risk Logic'],
-          coverage: ['All Audit Areas'],
-          techStack: 'Cloud-based, proprietary'
-        }
-      }
-    ],
-    strengths: ['Strong analytics differentiator for mid-tier', 'Whole-ledger predictive modeling via Lumen', 'Integrated Leap + Lumen platform', 'AI/RPA roadmap underway'],
-    weaknesses: ['Significantly smaller investment pool vs Big 4', 'Limited public GenAI/agentic disclosure', 'Fewer specialist analytics staff'],
-    recentNews: 'Actively developing AI capabilities including RPA and machine learning integration. Transition to "Audit of the Future" framework underway.'
-  },
-
-  {
-    id: 'bdo',
-    name: 'BDO',
-    tier: 'mid',
-    color: '#e4002b',
-    logo: 'B',
-    flagship: 'BDO Audit Innovation',
-    launched: 2020,
-    auditors: '~8,000',
-    countries: '160+',
-    aiLevel: 'genai',
-    aiScore: 65,
-    breadth: 4,
-    desc: 'BDO\'s multi-million-dollar audit innovation program focuses on AI, blockchain assurance, and real-time auditing capabilities. The 2025 BDO Audit Innovation Survey found 81% of finance leaders place greater trust in firms using advanced technologies, with 97% willing to pay more for technology-enabled audits.',
-    tools: [
-      {
-        id: 'bdo-analytics',
-        name: 'BDO Analytics Suite',
-        category: 'Audit Analytics',
-        icon: '📈',
-        phase: 'execution',
-        desc: 'BDO\'s intelligent automation and advanced analytics capabilities for audit engagements. Leverages data analytics, AI, and automation for enhanced audit quality across its global network.',
-        capabilities: ['Data Analytics','Intelligent Automation','Risk Identification','Anomaly Detection','Process Automation'],
-        balances: ['Journal Entries','Revenue','Payables'],
-        industries: ['Cross-Industry','Private Equity','Real Estate','Financial Services'],
-        methodology: 'Data analytics + automation',
-        aiIntegration: 'AI + RPA',
-        details: {
-          description: 'BDO\'s audit innovation program is built on four pillars: advancing technology seamlessly across the global network; integrating advanced AI capabilities; developing blockchain-based assurance solutions; and expanding real-time auditing. The 2025 BDO Audit Innovation Survey indicates 63% of finance leaders say technology leads to more efficient processes, and 93% report auditor technology sophistication now matches their own.',
-          keyFeatures: [
-            'Advanced analytics for full-population testing',
-            'Intelligent automation for routine audit tasks',
-            'Risk identification and anomaly detection',
-            'Blockchain assurance capabilities in development',
-            'Real-time auditing capabilities roadmap',
-            'AI governance framework under development'
-          ],
-          limitations: ['Less specific platform detail than Big 4', 'PCAOB 34% inspection deficiency noted in 2025'],
-          aiCapabilities: ['AI Analytics','RPA','Rule-based Automation'],
-          coverage: ['Journal Entries','Revenue','Payables','Inventory'],
-          techStack: 'Cloud-based, vendor analytics tools, AI integrations'
-        }
-      }
-    ],
-    strengths: ['160+ country network', 'Rapid technology investment growth', 'Strong private company/PE market focus', 'Finance leader trust scores rising (81%)'],
-    weaknesses: ['PCAOB deficiency rate concerns', 'Less mature AI platform vs Big 4', 'Data governance confidence declining (46% mature in 2025 vs 55% in 2024)'],
-    recentNews: '2025 BDO Audit Innovation Survey: 97% of finance leaders willing to pay more for technology-enabled audits. Blockchain-based assurance and real-time auditing on near-term roadmap.'
-  },
-
-  {
-    id: 'rsm',
-    name: 'RSM',
-    tier: 'mid',
-    color: '#005eb8',
-    logo: 'R',
-    flagship: 'RSM Intelligent Audit',
-    launched: 2020,
-    auditors: '~5,000',
-    countries: '120+',
-    aiLevel: 'genai',
-    aiScore: 60,
-    breadth: 4,
-    desc: 'RSM\'s middle-market focused intelligent audit approach combines data analytics, AI, and technology to deliver insightful audits to private and mid-cap public companies. RSM positions its analytics advantage specifically for complex middle-market clients overlooked by Big 4 focus on Fortune 500.',
-    tools: [
-      {
-        id: 'rsm-digital',
-        name: 'RSM Digital Audit',
-        category: 'Analytics-Enabled Audit',
-        icon: '🔍',
-        phase: 'execution',
-        desc: 'RSM\'s analytics-driven audit approach for middle-market clients. Combines data analytics, AI tools, and industry-specific models to provide deeper insights than traditional sampling for complex private and PE-backed companies.',
-        capabilities: ['Data Analytics','Middle-Market Analytics','Private Equity Audit','Revenue Testing','GL Analysis'],
-        balances: ['Journal Entries','Revenue','Payables','Inventory'],
-        industries: ['Manufacturing','Distribution','Technology','Real Estate','Healthcare','Private Equity'],
-        methodology: 'Risk-based analytics for middle market',
-        aiIntegration: 'AI Analytics Tools',
-        details: {
-          description: 'RSM positions its digital audit capabilities specifically for the middle market, arguing that Big 4 firms focus their best analytics on Fortune 500 clients. RSM\'s analytics tools analyze full transaction populations for revenue, payables, and journal entries while providing industry-specific risk models for manufacturing, distribution, real estate, and technology companies.',
-          keyFeatures: [
-            'Middle-market focused analytics models',
-            'Full-population GL and transaction analysis',
-            'Industry-specific risk scoring',
-            'Private equity and owner-managed business expertise',
-            'Cross-industry analytics benchmarking'
-          ],
-          limitations: ['Smaller scale vs Big 4 investment', 'Limited public platform detail'],
-          aiCapabilities: ['Analytics Tools','Statistical Analysis'],
-          coverage: ['Journal Entries','Revenue','Payables','Inventory'],
-          techStack: 'Cloud-based analytics, third-party tool integrations'
-        }
-      }
-    ],
-    strengths: ['Middle-market specialization', 'Deep PE and private company expertise', 'Growing analytics investment', 'Less competition for mid-cap clients'],
-    weaknesses: ['Limited public platform disclosure', 'Smaller analytics team', 'Platform maturity well behind Big 4'],
-    recentNews: 'Continuing investment in digital audit capabilities with focus on serving complex middle-market clients with Big 4-quality analytics.'
-  },
-
-  {
-    id: 'crowe',
-    name: 'Crowe',
-    tier: 'mid',
-    color: '#009a44',
-    logo: 'C',
-    flagship: 'Crowe Audit Technology',
-    launched: 2019,
-    auditors: '~4,000',
-    countries: '145+',
-    aiLevel: 'genai',
-    aiScore: 55,
-    breadth: 3,
-    desc: 'Crowe LLP specializes in industry-specific analytics for financial services, banking, insurance, and healthcare. Its audit technology capabilities emphasize deep sector expertise combined with data analytics for complex regulatory environments including BSA/AML, insurance reserves, and healthcare compliance.',
-    tools: [
-      {
-        id: 'crowe-analytics',
-        name: 'Crowe Specialty Analytics',
-        category: 'Industry-Specific Analytics',
-        icon: '🏦',
-        phase: 'execution',
-        desc: 'Crowe\'s analytics platform specializing in financial services, banking, and insurance. Covers BSA/AML compliance analytics, insurance reserve testing, banking-specific loan loss analysis, and healthcare revenue cycle analytics.',
-        capabilities: ['Banking Analytics','Insurance Analytics','BSA/AML','Loan Loss Analysis','Insurance Reserves','Healthcare Revenue'],
-        balances: ['Loans','Insurance Reserves','Revenue','Allowances','Regulatory Capital'],
-        industries: ['Banking','Insurance','Healthcare','Government','Financial Services'],
-        methodology: 'Industry-specific risk analytics',
-        aiIntegration: 'AI Analytics + Sector Models',
-        details: {
-          description: 'Crowe differentiates on deep industry specialization rather than platform breadth. In banking, it offers loan portfolio analytics, CECL modeling, BSA/AML transaction testing, and regulatory capital analysis. In insurance, it covers reserve adequacy, loss ratio testing, and reinsurance analytics. Healthcare analytics cover revenue cycle, cost report testing, and compliance.',
-          keyFeatures: [
-            'Bank loan portfolio full-population analysis',
-            'CECL allowance model testing',
-            'BSA/AML transaction pattern analytics',
-            'Insurance reserve adequacy analytics',
-            'Healthcare revenue cycle testing',
-            'Government fund accountability analytics'
-          ],
-          limitations: ['Narrow industry focus (not strong in manufacturing/retail)', 'Smaller platform investment', 'Limited GenAI disclosure'],
-          aiCapabilities: ['Sector ML Models','Statistical Analytics'],
-          coverage: ['Loans','Reserves','BSA/AML','Revenue','Insurance Liabilities'],
-          techStack: 'Cloud analytics, sector-specific models'
-        }
-      }
-    ],
-    strengths: ['Deep financial services specialization', 'BSA/AML analytics leader among mid-tier', 'Insurance and banking sector depth', 'Healthcare analytics capability'],
-    weaknesses: ['Narrow industry focus', 'Limited cross-industry analytics breadth', 'Lower public AI maturity vs peers'],
-    recentNews: 'Continuing investment in financial services analytics and AI-powered BSA/AML transaction monitoring capabilities.'
-  }
-];
-
-// ─── STATE ───────────────────────────────────────────────────────────────────
-
-let currentView = 'home';
-let currentFirm = null;
-let currentTool = null;
-let filters = { tier: 'all', ai: 'all' };
-
-// ─── NAVIGATION ──────────────────────────────────────────────────────────────
-
-function showView(view, firmId, toolId) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  
-  if (view === 'home') {
-    document.getElementById('view-home').classList.add('active');
-    updateBreadcrumb(['Market Overview']);
-  } else if (view === 'firm') {
-    currentFirm = FIRMS.find(f => f.id === firmId);
-    renderFirmDetail(currentFirm);
-    document.getElementById('view-firm').classList.add('active');
-    updateBreadcrumb(['Market Overview', currentFirm.name]);
-  } else if (view === 'tool') {
-    currentFirm = FIRMS.find(f => f.id === firmId);
-    currentTool = currentFirm.tools.find(t => t.id === toolId);
-    renderToolDetail(currentFirm, currentTool);
-    document.getElementById('view-tool').classList.add('active');
-    updateBreadcrumb(['Market Overview', currentFirm.name, currentTool.name]);
-  }
-  
-  currentView = view;
-  window.scrollTo(0, 0);
+function showView(view,firmId,toolId){
+document.querySelectorAll(’.view’).forEach(v=>v.classList.remove(‘active’));
+if(view===‘home’){document.getElementById(‘view-home’).classList.add(‘active’);updateBreadcrumb([‘Market Overview’]);}
+else if(view===‘firm’){currentFirm=FIRMS.find(f=>f.id===firmId);renderFirmDetail(currentFirm);document.getElementById(‘view-firm’).classList.add(‘active’);updateBreadcrumb([‘Market Overview’,currentFirm.name]);}
+else if(view===‘tool’){currentFirm=FIRMS.find(f=>f.id===firmId);currentTool=currentFirm.tools.find(t=>t.id===toolId);renderToolDetail(currentFirm,currentTool);document.getElementById(‘view-tool’).classList.add(‘active’);updateBreadcrumb([‘Market Overview’,currentFirm.name,currentTool.name]);}
+window.scrollTo(0,0);
 }
 
-function updateBreadcrumb(crumbs) {
-  const bc = document.getElementById('breadcrumb');
-  bc.innerHTML = crumbs.map((c, i) => {
-    if (i === 0) return `<span class="crumb" onclick="showView('home')">${c}</span>`;
-    if (i === 1) return `<span class="sep">›</span><span class="crumb" onclick="showView('firm','${currentFirm.id}')">${c}</span>`;
-    return `<span class="sep">›</span><span class="crumb">${c}</span>`;
-  }).join('');
+function updateBreadcrumb(crumbs){
+document.getElementById(‘breadcrumb’).innerHTML=crumbs.map((c,i)=>{
+if(i===0)return`<span class="crumb" onclick="showView('home')">${c}</span>`;
+if(i===1)return`<span class="sep">›</span><span class="crumb" onclick="showView('firm','${currentFirm.id}')">${c}</span>`;
+return`<span class="sep">›</span><span class="crumb">${c}</span>`;
+}).join(’’);
 }
 
-// ─── FILTERS ─────────────────────────────────────────────────────────────────
-
-function setFilter(type, val, btn) {
-  filters[type] = val;
-  btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderFirmGrid();
+function setFilter(type,val,btn){
+filters[type]=val;
+btn.parentElement.querySelectorAll(’.filter-btn’).forEach(b=>b.classList.remove(‘active’));
+btn.classList.add(‘active’);
+renderFirmGrid();
 }
 
-function switchMainTab(tab, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  
-  document.getElementById('main-tab-firms').style.display = tab === 'firms' ? 'block' : 'none';
-  document.getElementById('main-tab-compare').style.display = tab === 'compare' ? 'block' : 'none';
-  document.getElementById('main-tab-positioning').style.display = tab === 'positioning' ? 'block' : 'none';
-  
-  if (tab === 'compare') renderCompareTable();
-  if (tab === 'positioning') renderPositioningMap();
+function switchMainTab(tab,btn){
+document.querySelectorAll(’.tab-btn’).forEach(b=>b.classList.remove(‘active’));
+btn.classList.add(‘active’);
+document.getElementById(‘main-tab-firms’).style.display=tab===‘firms’?‘block’:‘none’;
+document.getElementById(‘main-tab-compare’).style.display=tab===‘compare’?‘block’:‘none’;
+document.getElementById(‘main-tab-positioning’).style.display=tab===‘positioning’?‘block’:‘none’;
+if(tab===‘compare’)renderCompareTable();
+if(tab===‘positioning’)renderPositioningMap();
 }
 
-// ─── RENDER FIRM GRID ────────────────────────────────────────────────────────
-
-function renderFirmGrid() {
-  const grid = document.getElementById('firm-grid');
-  
-  let firms = FIRMS.filter(f => {
-    if (filters.tier === 'big4' && f.tier !== 'big4') return false;
-    if (filters.tier === 'mid' && f.tier !== 'mid') return false;
-    if (filters.ai === 'agentic' && f.aiLevel !== 'agentic') return false;
-    if (filters.ai === 'genai' && f.aiLevel === 'basic') return false;
-    return true;
-  });
-  
-  document.getElementById('firm-count').textContent = `${firms.length} firms`;
-  
-  grid.innerHTML = firms.map((f, i) => `
-    <div class="firm-card animate-in stagger-${Math.min(i+1,8)}" onclick="showView('firm','${f.id}')">
-      <div class="hex-accent">◈</div>
-      <span class="firm-card-arrow">→</span>
-      <div class="firm-card-top">
-        <div class="firm-logo-box" style="background:${f.color}22;color:${f.color};border:1px solid ${f.color}44;">${f.logo}</div>
-        <div class="firm-meta">
-          <div class="firm-name">${f.name}</div>
-          <div class="firm-tier">${f.tier === 'big4' ? '◆ Big Four' : '◇ Mid-Tier'} · ${f.auditors} auditors</div>
-        </div>
-      </div>
-      <div class="firm-flagship">
-        <span class="flagship-dot"></span>
-        ${f.flagship}
-      </div>
-      <div class="ai-bar-wrap">
-        <div class="ai-bar-label">
-          <span>AI Maturity</span>
-          <span style="color:${f.aiScore >= 90 ? 'var(--accent3)' : f.aiScore >= 75 ? 'var(--accent)' : 'var(--gold)'}">${f.aiScore}/100</span>
-        </div>
-        <div class="ai-bar-track">
-          <div class="ai-bar-fill" style="width:${f.aiScore}%"></div>
-        </div>
-      </div>
-      <div class="firm-desc">${f.desc.substring(0,140)}...</div>
-      <div class="firm-tools-preview">
-        ${f.tools.slice(0,4).map(t => `<span class="tool-tag">${t.name}</span>`).join('')}
-        ${f.tools.length > 4 ? `<span class="tool-tag">+${f.tools.length-4} more</span>` : ''}
-      </div>
-      <div class="firm-metrics">
-        <div class="firm-metric-item">
-          <div class="firm-metric-val" style="color:${f.color}">${f.tools.length}</div>
-          <div class="firm-metric-label">Tools</div>
-        </div>
-        <div class="firm-metric-item">
-          <div class="firm-metric-val">${f.countries}</div>
-          <div class="firm-metric-label">Countries</div>
-        </div>
-        <div class="firm-metric-item">
-          <div class="firm-metric-val" style="color:var(--${f.aiLevel === 'agentic' ? 'green' : f.aiLevel === 'genai' ? 'accent3' : 'gold'})">${f.aiLevel === 'agentic' ? '🤖' : f.aiLevel === 'genai' ? '✦' : '○'} ${f.aiLevel === 'agentic' ? 'Agentic' : f.aiLevel === 'genai' ? 'GenAI' : 'Basic'}</div>
-          <div class="firm-metric-label">AI Level</div>
-        </div>
-      </div>
-    </div>
-  `).join('');
+function renderFirmGrid(){
+const grid=document.getElementById(‘firm-grid’);
+let firms=FIRMS.filter(f=>{
+if(filters.tier===‘big4’&&f.tier!==‘big4’)return false;
+if(filters.tier===‘mid’&&f.tier!==‘mid’)return false;
+if(filters.ai===‘agentic’&&f.aiLevel!==‘agentic’)return false;
+if(filters.ai===‘genai’&&f.aiLevel===‘basic’)return false;
+return true;
+});
+document.getElementById(‘firm-count’).textContent=`${firms.length} firms`;
+grid.innerHTML=firms.map((f,i)=>` <div class="firm-card animate-in stagger-${Math.min(i+1,8)}" onclick="showView('firm','${f.id}')"> <span class="firm-card-arrow">→</span> <div class="firm-card-top"> <div class="firm-logo-box" style="background:${f.color}22;color:${f.color};border:1px solid ${f.color}44">${f.logo}</div> <div class="firm-meta"> <div class="firm-name">${f.name}</div> <div class="firm-tier">${f.tier==='big4'?'◆ Big Four':'◇ Mid-Tier'} · ${f.auditors} auditors</div> </div> </div> <div class="firm-flagship"><span class="flagship-dot"></span>${f.flagship}</div> <div class="ai-bar-wrap"> <div class="ai-bar-label"><span>AI Maturity</span><span style="color:${f.aiScore>=90?'var(--accent3)':f.aiScore>=75?'var(--accent)':'var(--gold)'}">${f.aiScore}/100</span></div> <div class="ai-bar-track"><div class="ai-bar-fill" style="width:${f.aiScore}%"></div></div> </div> <div class="firm-desc">${f.desc.substring(0,160)}...</div> <div class="firm-tools-preview"> ${f.tools.slice(0,4).map(t=>`<span class="tool-tag">${t.name}</span>`).join('')} ${f.tools.length>4?`<span class="tool-tag">+${f.tools.length-4} more</span>`:''} </div> <div class="firm-metrics"> <div class="firm-metric-item"><div class="firm-metric-val" style="color:${f.color}">${f.tools.length}</div><div class="firm-metric-label">Tools</div></div> <div class="firm-metric-item"><div class="firm-metric-val">${f.countries}</div><div class="firm-metric-label">Countries</div></div> <div class="firm-metric-item"><div class="firm-metric-val" style="color:${f.aiLevel==='agentic'?'var(--green)':'var(--accent3)'}">${f.aiLevel==='agentic'?'🤖 Agentic':'✦ GenAI'}</div><div class="firm-metric-label">AI Level</div></div> </div> </div>`).join(’’);
 }
 
-// ─── RENDER COMPARE TABLE ────────────────────────────────────────────────────
-
-function renderCompareTable() {
-  const table = document.getElementById('compare-table');
-  const features = [
-    'Full-Population Testing', 'JE Analytics', 'ML/AI Risk Scoring', 'GenAI Integration',
-    'Agentic AI', 'Client Portal', 'Revenue Analytics', 'Payables Analytics',
-    'Inventory Analytics', 'Blockchain/Crypto', 'Industry-Specific Modules', 'Databricks Integration'
-  ];
-
-  const firmFeatures = {
-    deloitte: [1,1,1,1,1,1,1,1,1,0,1,1],
-    pwc:      [1,1,1,0.5,0,1,1,1,1,1,1,0],
-    ey:       [1,1,1,0.5,0,1,1,1,1,0,1,0],
-    kpmg:     [1,1,1,1,1,1,1,1,1,0,1,1],
-    gt:       [1,1,0.5,0.5,0,1,1,1,0.5,0,0.5,0],
-    bdo:      [1,1,0.5,0.5,0,1,0.5,0.5,0,0,0,0],
-    rsm:      [0.5,1,0,0.5,0,0.5,0.5,0.5,0,0,0.5,0],
-    crowe:    [0.5,0.5,0.5,0,0,0.5,0.5,0.5,0,0,1,0],
-  };
-
-  const checkMark = v => v === 1 ? '<span class="check">✓</span>' : v === 0.5 ? '<span class="partial">◑</span>' : '<span class="cross">–</span>';
-
-  table.innerHTML = `
-    <thead>
-      <tr>
-        <th style="min-width:140px">Firm</th>
-        ${features.map(f => `<th>${f}</th>`).join('')}
-      </tr>
-    </thead>
-    <tbody>
-      ${FIRMS.map(firm => `
-        <tr onclick="showView('firm','${firm.id}')">
-          <td>
-            <div class="comp-firm-cell">
-              <div class="comp-firm-dot" style="background:${firm.color}"></div>
-              <span style="font-weight:600">${firm.name}</span>
-            </div>
-          </td>
-          ${(firmFeatures[firm.id] || features.map(() => 0)).map(v => `<td style="text-align:center">${checkMark(v)}</td>`).join('')}
-        </tr>
-      `).join('')}
-    </tbody>
-  `;
+function renderCompareTable(){
+const features=[‘Full Population Testing’,‘JE Analytics’,‘ML/AI Risk Scoring’,‘GenAI Integration’,‘Agentic AI’,‘Client Portal’,‘Revenue Analytics’,‘Payables Analytics’,‘Inventory Analytics’,‘Blockchain/Crypto’,‘Industry-Specific Modules’,‘Public Tech Stack Disclosure’];
+const ff={deloitte:[1,1,1,1,1,1,1,1,1,0,1,0],pwc:[1,1,1,.5,0,1,1,1,1,1,1,0],ey:[1,1,1,.5,0,1,1,1,1,0,1,0],kpmg:[1,1,1,1,1,1,1,1,1,0,1,1],gt:[1,1,.5,.5,0,1,1,1,.5,0,.5,0],bdo:[1,1,.5,.5,0,1,.5,.5,0,0,0,0],rsm:[.5,1,0,.5,0,.5,.5,.5,0,0,.5,0],crowe:[.5,.5,.5,0,0,.5,.5,.5,0,0,1,0]};
+const cm=v=>v===1?’<span class="check">✓</span>’:v===.5?’<span class="partial">◑</span>’:’<span class="cross">–</span>’;
+document.getElementById(‘compare-table’).innerHTML=`<thead><tr><th style="min-width:140px">Firm</th>${features.map(f=>`<th>${f}</th>`).join('')}</tr></thead><tbody>${FIRMS.map(firm=>`<tr onclick="showView('firm','${firm.id}')"><td><div class="comp-firm-cell"><div class="comp-firm-dot" style="background:${firm.color}"></div><span style="font-weight:600">${firm.name}</span></div></td>${(ff[firm.id]||features.map(()=>0)).map(v=>`<td style="text-align:center">${cm(v)}</td>`).join(’’)}</tr>`).join('')}</tbody>`;
 }
 
-// ─── RENDER POSITIONING MAP ──────────────────────────────────────────────────
-
-function renderPositioningMap() {
-  const chart = document.getElementById('positioning-chart');
-  const w = chart.offsetWidth || 900;
-  const h = chart.offsetHeight || 320;
-  
-  // Positions: x = breadth (0-10), y = AI maturity (0-100)
-  const positions = [
-    { id: 'deloitte', x: 0.88, y: 0.10 },
-    { id: 'kpmg',    x: 0.92, y: 0.06 },
-    { id: 'pwc',     x: 0.82, y: 0.18 },
-    { id: 'ey',      x: 0.78, y: 0.22 },
-    { id: 'gt',      x: 0.52, y: 0.38 },
-    { id: 'bdo',     x: 0.40, y: 0.45 },
-    { id: 'rsm',     x: 0.32, y: 0.52 },
-    { id: 'crowe',   x: 0.30, y: 0.60 },
-  ];
-
-  // Remove existing nodes
-  chart.querySelectorAll('.pos-node').forEach(n => n.remove());
-
-  positions.forEach(pos => {
-    const firm = FIRMS.find(f => f.id === pos.id);
-    const node = document.createElement('div');
-    node.className = 'pos-node';
-    node.style.left = `${pos.x * 100}%`;
-    node.style.top = `${pos.y * 100}%`;
-    node.innerHTML = `
-      <div class="pos-circle" style="background:${firm.color}cc;border:2px solid ${firm.color}">${firm.logo}</div>
-      <span class="pos-node-label">${firm.name}</span>
-    `;
-    node.onclick = () => showView('firm', firm.id);
-    chart.appendChild(node);
-  });
-  
-  // Add axis labels
-  const axisB = document.createElement('div');
-  axisB.className = 'pos-label';
-  axisB.style.cssText = 'bottom:28px;left:8px';
-  axisB.textContent = 'Narrow';
-  chart.appendChild(axisB);
-  
-  const axisR = document.createElement('div');
-  axisR.className = 'pos-label';
-  axisR.style.cssText = 'bottom:28px;right:8px';
-  axisR.textContent = 'Broad';
-  chart.appendChild(axisR);
+function renderPositioningMap(){
+const chart=document.getElementById(‘positioning-chart’);
+chart.querySelectorAll(’.pos-node’).forEach(n=>n.remove());
+const pos=[{id:‘deloitte’,x:.82,y:.12},{id:‘kpmg’,x:.88,y:.08},{id:‘pwc’,x:.78,y:.20},{id:‘ey’,x:.72,y:.26},{id:‘gt’,x:.50,y:.42},{id:‘bdo’,x:.38,y:.52},{id:‘rsm’,x:.30,y:.60},{id:‘crowe’,x:.26,y:.68}];
+pos.forEach(p=>{
+const firm=FIRMS.find(f=>f.id===p.id);
+const node=document.createElement(‘div’);
+node.className=‘pos-node’;
+node.style.left=`${p.x*100}%`;node.style.top=`${p.y*100}%`;
+node.innerHTML=`<div class="pos-circle" style="background:${firm.color}cc;border:2px solid ${firm.color}">${firm.logo}</div><span class="pos-node-label">${firm.name}</span>`;
+node.onclick=()=>showView(‘firm’,firm.id);
+chart.appendChild(node);
+});
 }
 
-// ─── RENDER FIRM DETAIL ──────────────────────────────────────────────────────
-
-function renderFirmDetail(firm) {
-  const el = document.getElementById('firm-detail-content');
-  
-  el.innerHTML = `
-    <button class="back-btn" onclick="showView('home')">← Back to Overview</button>
-    
-    <div class="firm-detail-header">
-      <div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">${firm.tier === 'big4' ? '◆ Big Four' : '◇ Mid-Tier'} · Platform Intelligence</div>
-        <div class="detail-firm-name" style="color:${firm.color}">${firm.name}</div>
-        <div class="detail-firm-subtitle">${firm.desc}</div>
-        <div class="detail-tags">
-          <span class="detail-tag tag-platform">🔷 ${firm.flagship}</span>
-          <span class="detail-tag tag-ai">${firm.aiLevel === 'agentic' ? '🤖 Agentic AI' : firm.aiLevel === 'genai' ? '✦ GenAI' : '○ Analytics'}</span>
-          <span class="detail-tag tag-coverage">🌍 ${firm.countries} Countries</span>
-          <span class="detail-tag tag-coverage">👥 ${firm.auditors}</span>
-          <span class="detail-tag tag-platform">📅 Since ${firm.launched}</span>
-        </div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:56px;letter-spacing:-3px;color:${firm.color};">${firm.aiScore}</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">AI Maturity Score</div>
-        <div style="margin-top:8px">
-          <div class="ai-bar-track" style="width:140px">
-            <div class="ai-bar-fill" style="width:${firm.aiScore}%"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATS ROW -->
-    <div class="firm-stats-row">
-      <div class="firm-stat-box">
-        <div class="fsb-value">${firm.tools.length}</div>
-        <div class="fsb-label">Platform Tools</div>
-      </div>
-      <div class="firm-stat-box">
-        <div class="fsb-value">${firm.auditors}</div>
-        <div class="fsb-label">Auditors Enabled</div>
-      </div>
-      <div class="firm-stat-box">
-        <div class="fsb-value">${firm.countries}</div>
-        <div class="fsb-label">Countries</div>
-      </div>
-      <div class="firm-stat-box">
-        <div class="fsb-value">${firm.breadth}/10</div>
-        <div class="fsb-label">Analytics Breadth</div>
-      </div>
-      <div class="firm-stat-box">
-        <div class="fsb-value" style="color:${firm.aiLevel === 'agentic' ? 'var(--green)' : 'var(--accent3)'}">
-          ${firm.aiLevel === 'agentic' ? 'Agentic' : 'GenAI'}
-        </div>
-        <div class="fsb-label">AI Level</div>
-      </div>
-    </div>
-
-    <!-- RECENT NEWS -->
-    <div class="info-box" style="margin-bottom:32px;border-left:3px solid ${firm.color};">
-      <div class="info-box-title">📰 Latest Intelligence</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.6;">${firm.recentNews}</p>
-    </div>
-
-    <!-- TOOLS -->
-    <div class="tools-section-title">Platform Tools (${firm.tools.length})</div>
-    <div class="tools-grid">
-      ${firm.tools.map(t => renderToolCard(firm, t)).join('')}
-    </div>
-
-    <!-- STRENGTHS / WEAKNESSES -->
-    <div class="detail-grid-2" style="margin-bottom:32px;">
-      <div class="info-box" style="border-top:2px solid var(--green)">
-        <div class="info-box-title">✦ Competitive Strengths</div>
-        <ul class="bullet-list">
-          ${firm.strengths.map(s => `<li>${s}</li>`).join('')}
-        </ul>
-      </div>
-      <div class="info-box" style="border-top:2px solid var(--red)">
-        <div class="info-box-title">⚠ Relative Weaknesses</div>
-        <ul class="bullet-list">
-          ${firm.weaknesses.map(w => `<li>${w}</li>`).join('')}
-        </ul>
-      </div>
-    </div>
-
-    <!-- COVERAGE MAP -->
-    <div class="info-box" style="margin-bottom:32px;">
-      <div class="info-box-title">📊 Audit Area Coverage</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
-        ${['Journal Entries','Revenue','Accounts Payable','Accounts Receivable','Inventory','Fixed Assets','Payroll','Equity','Cash','Derivatives','Lease Accounting','Disclosures'].map(area => {
-          const covered = firm.tools.some(t => t.balances.includes(area) || t.balances.includes('All Accounts') || t.balances.includes('All GL Accounts') || t.balances.includes('All Financial Statement Areas'));
-          return `<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 10px;border-radius:3px;${covered ? `background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:var(--green)` : `background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text3)`}">${covered ? '✓' : '–'} ${area}</span>`;
-        }).join('')}
-      </div>
-    </div>
-  `;
+function renderFirmDetail(firm){
+document.getElementById(‘firm-detail-content’).innerHTML=` <button class="back-btn" onclick="showView('home')">← Back to Overview</button> <div class="firm-detail-header"> <div> <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px">${firm.tier==='big4'?'◆ Big Four':'◇ Mid-Tier'} · Platform Intelligence</div> <div class="detail-firm-name" style="color:${firm.color}">${firm.name}</div> <div class="detail-firm-subtitle">${firm.desc}</div> <div class="detail-tags"> <span class="detail-tag tag-platform">🔷 ${firm.flagship}</span> <span class="detail-tag tag-ai">${firm.aiLevel==='agentic'?'🤖 Agentic AI':'✦ GenAI'}</span> <span class="detail-tag tag-coverage">🌍 ${firm.countries} Countries</span> <span class="detail-tag tag-coverage">👥 ${firm.auditors}</span> <span class="detail-tag tag-platform">📅 Since ${firm.launched}</span> </div> </div> <div style="text-align:right"> <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:56px;letter-spacing:-3px;color:${firm.color}">${firm.aiScore}</div> <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">AI Maturity Score</div> <div style="margin-top:8px"><div class="ai-bar-track" style="width:140px"><div class="ai-bar-fill" style="width:${firm.aiScore}%"></div></div></div> </div> </div> <div class="firm-stats-row"> <div class="firm-stat-box"><div class="fsb-value">${firm.tools.length}</div><div class="fsb-label">Platform Tools</div></div> <div class="firm-stat-box"><div class="fsb-value">${firm.auditors}</div><div class="fsb-label">Auditors Enabled</div></div> <div class="firm-stat-box"><div class="fsb-value">${firm.countries}</div><div class="fsb-label">Countries</div></div> <div class="firm-stat-box"><div class="fsb-value">${firm.breadth}/10</div><div class="fsb-label">Analytics Breadth</div></div> <div class="firm-stat-box"><div class="fsb-value" style="color:${firm.aiLevel==='agentic'?'var(--green)':'var(--accent3)'}">${firm.aiLevel==='agentic'?'Agentic':'GenAI'}</div><div class="fsb-label">AI Level</div></div> </div> <div class="info-box" style="margin-bottom:32px;border-left:3px solid ${firm.color}"><div class="info-box-title">📰 Latest Intelligence</div><p style="font-size:13px;color:var(--text2);line-height:1.6">${firm.recentNews}</p></div> <div class="tools-section-title">Platform Tools (${firm.tools.length})</div> <div class="tools-grid">${firm.tools.map(t=>renderToolCard(firm,t)).join('')}</div> <div class="detail-grid-2" style="margin-bottom:32px"> <div class="info-box" style="border-top:2px solid var(--green)"><div class="info-box-title">✦ Competitive Strengths</div><ul class="bullet-list">${firm.strengths.map(s=>`<li>${s}</li>`).join('')}</ul></div> <div class="info-box" style="border-top:2px solid var(--red)"><div class="info-box-title">⚠ Relative Weaknesses</div><ul class="bullet-list">${firm.weaknesses.map(w=>`<li>${w}</li>`).join('')}</ul></div> </div> <div class="info-box"> <div class="info-box-title">📊 Audit Area Coverage</div> <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"> ${['Journal Entries','Revenue','Accounts Payable','Accounts Receivable','Inventory','Fixed Assets','Payroll','Equity','Cash','Derivatives','Lease Accounting','Disclosures'].map(area=>{ const covered=firm.tools.some(t=>t.balances.some(b=>b.includes('All')||b.includes(area.split(' ')[0])||b.includes(area))); return`<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 10px;border-radius:3px;${covered?'background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);color:var(--green)':'background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--text3)'}">${covered?‘✓’:’–’} ${area}</span>`; }).join('')} </div> </div>`;
 }
 
-function renderToolCard(firm, t) {
-  const phaseClass = t.phase === 'planning' ? 'phase-planning' : t.phase === 'execution' ? 'phase-execution' : t.phase === 'completion' ? 'phase-completion' : 'phase-all';
-  const phaseLabel = t.phase === 'planning' ? '◷ Planning' : t.phase === 'execution' ? '◈ Execution' : t.phase === 'completion' ? '◉ Completion' : '◐ All Phases';
-  
-  return `
-    <div class="tool-card" onclick="showView('tool','${firm.id}','${t.id}')">
-      <div class="tool-card-header">
-        <div class="tool-icon">${t.icon}</div>
-        <div class="tool-info">
-          <div class="tool-name">${t.name}</div>
-          <div class="tool-category">${t.category}</div>
-        </div>
-        <span class="phase-badge ${phaseClass}">${phaseLabel}</span>
-      </div>
-      <div class="tool-desc">${t.desc}</div>
-      <div class="tool-capabilities">
-        ${t.capabilities.slice(0,5).map(c => `<span class="cap-tag">${c}</span>`).join('')}
-        ${t.capabilities.length > 5 ? `<span class="cap-tag">+${t.capabilities.length-5}</span>` : ''}
-      </div>
-      <div class="tool-meta-row">
-        <div class="tool-meta-item">Methodology<span>${t.methodology.substring(0,20)}${t.methodology.length > 20 ? '…' : ''}</span></div>
-        <div class="tool-meta-item">AI Level<span>${t.aiIntegration.substring(0,18)}${t.aiIntegration.length > 18 ? '…' : ''}</span></div>
-        <div class="tool-meta-item">Phase<span>${phaseLabel}</span></div>
-      </div>
-    </div>
-  `;
+function renderToolCard(firm,t){
+const pc=t.phase===‘planning’?‘phase-planning’:t.phase===‘execution’?‘phase-execution’:t.phase===‘completion’?‘phase-completion’:‘phase-all’;
+const pl=t.phase===‘planning’?‘◷ Planning’:t.phase===‘execution’?‘◈ Execution’:t.phase===‘completion’?‘◉ Completion’:‘◐ All Phases’;
+return`<div class="tool-card" onclick="showView('tool','${firm.id}','${t.id}')"> <div class="tool-card-header"> <div class="tool-icon">${t.icon}</div> <div class="tool-info"><div class="tool-name">${t.name}</div><div class="tool-category">${t.category}</div></div> <span class="phase-badge ${pc}">${pl}</span> </div> <div class="tool-desc">${t.desc}</div> <div class="tool-capabilities">${t.capabilities.slice(0,5).map(c=>`<span class="cap-tag">${c}</span>`).join('')}${t.capabilities.length>5?`<span class="cap-tag">+${t.capabilities.length-5}</span>`:’’}</div>
+<div class="tool-meta-row">
+<div class="tool-meta-item">Methodology<span>${t.methodology.substring(0,22)}${t.methodology.length>22?’…’:’’}</span></div>
+<div class="tool-meta-item">AI Level<span>${t.aiIntegration.substring(0,18)}${t.aiIntegration.length>18?’…’:’’}</span></div>
+<div class="tool-meta-item">Phase<span>${pl}</span></div>
+</div>
+
+  </div>`;
 }
 
-// ─── RENDER TOOL DETAIL ──────────────────────────────────────────────────────
-
-function renderToolDetail(firm, tool) {
-  const el = document.getElementById('tool-detail-content');
-  const phaseClass = tool.phase === 'planning' ? 'phase-planning' : tool.phase === 'execution' ? 'phase-execution' : tool.phase === 'completion' ? 'phase-completion' : 'phase-all';
-  const phaseLabel = tool.phase === 'planning' ? 'Planning' : tool.phase === 'execution' ? 'Execution' : tool.phase === 'completion' ? 'Completion' : 'All Phases';
-
-  el.innerHTML = `
-    <button class="back-btn" onclick="showView('firm','${firm.id}')">← Back to ${firm.name}</button>
-
-    <div class="tool-detail-hero">
-      <div class="tdh-breadcrumb">
-        <span onclick="showView('home')">Market Overview</span> › 
-        <span onclick="showView('firm','${firm.id}')">${firm.name}</span> › 
-        ${tool.name}
-      </div>
-      <div class="tdh-main">
-        <div>
-          <div class="tdh-icon-name">
-            <div class="tdh-big-icon">${tool.icon}</div>
-            <div class="tdh-tool-name">${tool.name}</div>
-          </div>
-          <div class="tdh-desc">${tool.details.description}</div>
-          <div class="tdh-tags">
-            <span class="detail-tag tag-platform">${firm.name}</span>
-            <span class="detail-tag tag-ai">${tool.aiIntegration}</span>
-            <span class="phase-badge ${phaseClass}" style="font-size:11px;padding:4px 10px;">◐ ${phaseLabel}</span>
-            <span class="detail-tag tag-coverage">${tool.category}</span>
-          </div>
-        </div>
-        <div style="min-width:120px;text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:48px;letter-spacing:-2px;color:${firm.color};">${tool.details.aiCapabilities.length}</div>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">AI Capabilities</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MOCK DASHBOARD -->
-    <div class="mock-dashboard" style="margin-bottom:32px;">
-      <div class="mock-dash-header">
-        <div class="mock-dash-dots">
-          <div class="mock-dash-dot dot-red"></div>
-          <div class="mock-dash-dot dot-yellow"></div>
-          <div class="mock-dash-dot dot-green"></div>
-        </div>
-        <div class="mock-dash-title">${tool.name} — Simulated Interface Preview</div>
-      </div>
-      <div class="mock-dash-body">
-        ${renderMockDashboard(firm, tool)}
-      </div>
-    </div>
-
-    <!-- KEY FEATURES + COVERAGE GRID -->
-    <div class="detail-grid-2">
-      <div class="info-box">
-        <div class="info-box-title">✦ Key Features</div>
-        <ul class="bullet-list">
-          ${tool.details.keyFeatures.map(f => `<li>${f}</li>`).join('')}
-        </ul>
-      </div>
-      <div>
-        <div class="info-box" style="margin-bottom:16px;">
-          <div class="info-box-title">📐 AI Capabilities</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
-            ${tool.details.aiCapabilities.map(c => `<span class="detail-tag tag-ai">${c}</span>`).join('')}
-          </div>
-        </div>
-        <div class="info-box" style="margin-bottom:16px;">
-          <div class="info-box-title">📊 Account / Balance Coverage</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
-            ${tool.details.coverage.map(c => `<span class="detail-tag tag-coverage">${c}</span>`).join('')}
-          </div>
-        </div>
-        <div class="info-box">
-          <div class="info-box-title">⚙ Technology Stack</div>
-          <p style="font-size:13px;color:var(--text2);line-height:1.6;">${tool.details.techStack}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- AUDIT PHASE MAP -->
-    <div class="info-box" style="margin-top:24px;margin-bottom:24px;">
-      <div class="info-box-title">🗺 Audit Phase Application</div>
-      <div style="display:flex;align-items:stretch;gap:0;margin-top:16px;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
-        ${['Risk Assessment','Planning','Controls','Substantive Testing','Completion','Reporting'].map(phase => {
-          const isActive = tool.phase === 'all' || 
-            (tool.phase === 'planning' && ['Risk Assessment','Planning'].includes(phase)) ||
-            (tool.phase === 'execution' && ['Controls','Substantive Testing'].includes(phase)) ||
-            (tool.phase === 'completion' && ['Completion','Reporting'].includes(phase));
-          return `<div style="flex:1;padding:12px 8px;text-align:center;background:${isActive ? `${firm.color}22` : 'transparent'};border-right:1px solid var(--border);">
-            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:${isActive ? firm.color : 'var(--text3)'};">${phase.split(' ')[0]}</div>
-            <div style="font-size:16px;margin-top:4px;">${isActive ? '●' : '○'}</div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-
-    <!-- LIMITATIONS -->
-    <div class="info-box" style="border-top:2px solid var(--gold);">
-      <div class="info-box-title">⚠ Known Limitations & Considerations</div>
-      <ul class="bullet-list">
-        ${tool.details.limitations.map(l => `<li>${l}</li>`).join('')}
-      </ul>
-    </div>
-  `;
+function renderToolDetail(firm,tool){
+const pc=tool.phase===‘planning’?‘phase-planning’:tool.phase===‘execution’?‘phase-execution’:tool.phase===‘completion’?‘phase-completion’:‘phase-all’;
+const pl=tool.phase===‘planning’?‘Planning’:tool.phase===‘execution’?‘Execution’:tool.phase===‘completion’?‘Completion’:‘All Phases’;
+const mockRows=[{desc:‘Late JE — 11:58PM System Post’,user:‘SYS_BATCH’,amount:’$2,847,302’,risk:94,flag:‘🔴’},{desc:‘Intercompany Elimination Override’,user:‘CFO_OVERRIDE’,amount:’$1,234,000’,risk:87,flag:‘🔴’},{desc:‘Manual Revenue Adjustment’,user:‘JSMITH’,amount:’$892,450’,risk:76,flag:‘🟡’},{desc:‘Automated Depreciation Entry’,user:‘AUTO_POST’,amount:’$445,200’,risk:12,flag:‘🟢’},{desc:‘Accrued Expense Reversal’,user:‘CONTROLLER’,amount:’$328,000’,risk:68,flag:‘🟡’}];
+const riskBars=[12,28,45,31,67,23,89,42,15,38,71,19,55,33,88,27,44,62];
+document.getElementById(‘tool-detail-content’).innerHTML=` <button class="back-btn" onclick="showView('firm','${firm.id}')">← Back to ${firm.name}</button> <div class="tool-detail-hero"> <div class="tdh-breadcrumb"><span onclick="showView('home')">Market Overview</span> › <span onclick="showView('firm','${firm.id}')">${firm.name}</span> › ${tool.name}</div> <div class="tdh-main"> <div> <div class="tdh-icon-name"><div class="tdh-big-icon">${tool.icon}</div><div class="tdh-tool-name">${tool.name}</div></div> <div class="tdh-desc">${tool.details.description}</div> <div class="tdh-tags"> <span class="detail-tag tag-platform">${firm.name}</span> <span class="detail-tag tag-ai">${tool.aiIntegration}</span> <span class="phase-badge ${pc}" style="font-size:11px;padding:4px 10px">◐ ${pl}</span> <span class="detail-tag tag-coverage">${tool.category}</span> </div> </div> <div style="min-width:100px;text-align:center"> <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:48px;letter-spacing:-2px;color:${firm.color}">${tool.details.aiCapabilities.length}</div> <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">AI Capabilities</div> </div> </div> </div> <div class="mock-dashboard" style="margin-bottom:32px"> <div class="mock-dash-header"> <div class="mock-dash-dots"><div class="mock-dash-dot dot-red"></div><div class="mock-dash-dot dot-yellow"></div><div class="mock-dash-dot dot-green"></div></div> <div class="mock-dash-title">${tool.name} — Simulated Interface Preview</div> </div> <div class="mock-dash-body"> <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px"> <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Entries Analyzed</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-1px;color:${firm.color}">4.7M</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--green);margin-top:4px">▲ 100% population</div></div> <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:6px">High Risk Items</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-1px;color:var(--red)">847</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);margin-top:4px">0.018% of population</div></div> <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:6px">Dollar Coverage</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-1px;color:var(--accent3)">97.3%</div><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);margin-top:4px">Estimated value</div></div> </div> <div style="margin-bottom:20px"> <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Risk Distribution by Posting Date</div> <div style="display:flex;align-items:flex-end;gap:2px;height:56px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:8px"> ${riskBars.map(v=>`<div style="flex:1;border-radius:1px 1px 0 0;background:${v>60?'rgba(255,77,109,.7)':v>35?'rgba(245,166,35,.7)':'rgba(0,229,160,.5)'};height:${v}%"></div>`).join('')} </div> </div> <div> <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">High-Priority Items Queue (Simulated)</div> <table style="width:100%;border-collapse:collapse;font-size:12px"> <tr style="background:var(--surface2)"> <th style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)">Description</th> <th style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)">Posted By</th> <th style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:right;border-bottom:1px solid var(--border)">Amount</th> <th style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:center;border-bottom:1px solid var(--border)">Risk</th> </tr> ${mockRows.map(r=>`<tr style="border-bottom:1px solid rgba(255,255,255,.04)"><td style="padding:6px 8px;color:var(--text2)">${r.desc}</td><td style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">${r.user}</td><td style="padding:6px 8px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px">${r.amount}</td><td style="padding:6px 8px;text-align:center">${r.flag} <span style="font-size:10px;color:var(--text3)">${r.risk}%</span></td></tr>`).join('')} </table> </div> </div> </div> <div class="detail-grid-2"> <div class="info-box"><div class="info-box-title">✦ Key Features</div><ul class="bullet-list">${tool.details.keyFeatures.map(f=>`<li>${f}</li>`).join('')}</ul></div> <div> <div class="info-box" style="margin-bottom:16px"><div class="info-box-title">📐 AI Capabilities</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${tool.details.aiCapabilities.map(c=>`<span class="detail-tag tag-ai">${c}</span>`).join('')}</div></div> <div class="info-box" style="margin-bottom:16px"><div class="info-box-title">📊 Account Coverage</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${tool.details.coverage.map(c=>`<span class="detail-tag tag-coverage">${c}</span>`).join('')}</div></div> <div class="info-box"><div class="info-box-title">⚙ Technology Stack</div><p style="font-size:13px;color:var(--text2);line-height:1.6">${tool.details.techStack}</p></div> </div> </div> <div class="info-box" style="margin-top:24px;margin-bottom:24px"> <div class="info-box-title">🗺 Audit Phase Application</div> <div style="display:flex;align-items:stretch;gap:0;margin-top:16px;border:1px solid var(--border);border-radius:6px;overflow:hidden"> ${['Risk Assessment','Planning','Controls','Substantive Testing','Completion','Reporting'].map((phase,i)=>{ const active=tool.phase==='all'||(tool.phase==='planning'&&i<2)||(tool.phase==='execution'&&i>=2&&i<4)||(tool.phase==='completion'&&i>=4); return`<div style="flex:1;padding:12px 8px;text-align:center;background:${active?`${firm.color}22`:'transparent'};border-right:${i<5?'1px solid var(--border)':'none'}"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:${active?firm.color:'var(--text3)'}">${phase.split(’ ’)[0]}</div><div style="font-size:16px;margin-top:4px">${active?‘●’:‘○’}</div></div>`; }).join('')} </div> </div> <div class="info-box" style="border-top:2px solid var(--gold)"><div class="info-box-title">⚠ Known Limitations</div><ul class="bullet-list">${tool.details.limitations.map(l=>`<li>${l}</li>`).join('')}</ul></div>`;
 }
 
-// ─── MOCK DASHBOARD RENDERER ─────────────────────────────────────────────────
-
-function renderMockDashboard(firm, tool) {
-  // Generate contextual mock UI based on tool type
-  const isJE = tool.capabilities.some(c => c.toLowerCase().includes('journal') || c.toLowerCase().includes('je'));
-  const isRevenue = tool.capabilities.some(c => c.toLowerCase().includes('revenue'));
-  const isML = tool.aiIntegration.toLowerCase().includes('ml') || tool.aiIntegration.toLowerCase().includes('ai');
-  
-  const riskData = [12, 28, 45, 31, 67, 23, 89, 42, 15, 38, 71, 19, 55, 33, 88, 27, 44, 62];
-  const bars = riskData.map(v => `<div class="mini-bar" style="height:${v}%;background:${v > 60 ? 'var(--red)' : v > 35 ? 'var(--gold)' : 'var(--green)'};" title="Risk: ${v}%"></div>`).join('');
-  
-  const mockRows = [
-    { desc: 'Late JE Posted 11:58 PM', user: 'SYS_BATCH', amount: '$2,847,302', risk: 94, flag: '🔴' },
-    { desc: 'Intercompany Eliminations', user: 'CFO_OVERRIDE', amount: '$1,234,000', risk: 87, flag: '🔴' },
-    { desc: 'Manual Revenue Adj', user: 'JSMITH', amount: '$892,450', risk: 76, flag: '🟡' },
-    { desc: 'Standard Depreciation', user: 'AUTO_POST', amount: '$445,200', risk: 12, flag: '🟢' },
-    { desc: 'Accrued Expense Reversal', user: 'CONTROLLER', amount: '$328,000', risk: 68, flag: '🟡' },
-  ];
-
-  return `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">Entries Analyzed</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-1px;color:${firm.color}">4.7M</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--green);margin-top:4px;">▲ 100% population</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">High Risk Items</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-1px;color:var(--red)">847</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);margin-top:4px;">0.018% of population</div>
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:12px;">
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">Risk Coverage</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:22px;letter-spacing:-1px;color:var(--accent3)">97.3%</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);margin-top:4px;">Estimated dollar value</div>
-      </div>
-    </div>
-    
-    <div style="margin-bottom:20px;">
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Risk Distribution by Posting Date</div>
-      <div style="display:flex;align-items:flex-end;gap:2px;height:56px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:8px;">
-        ${riskData.map(v => `<div style="flex:1;border-radius:1px 1px 0 0;background:${v > 60 ? 'rgba(255,77,109,0.7)' : v > 35 ? 'rgba(245,166,35,0.7)' : 'rgba(0,229,160,0.5)'};height:${v}%;transition:height 0.3s"></div>`).join('')}
-      </div>
-    </div>
-
-    <div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">High-Priority Items Queue (Simulated)</div>
-      <table style="width:100%;border-collapse:collapse;font-size:12px;">
-        <tr style="background:var(--surface2);">
-          <th style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);">Description</th>
-          <th style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);">Posted By</th>
-          <th style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:right;border-bottom:1px solid var(--border);">Amount</th>
-          <th style="font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;color:var(--text3);padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);">Risk</th>
-        </tr>
-        ${mockRows.map(r => `
-          <tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
-            <td style="padding:6px 8px;color:var(--text2)">${r.desc}</td>
-            <td style="padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">${r.user}</td>
-            <td style="padding:6px 8px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px">${r.amount}</td>
-            <td style="padding:6px 8px;text-align:center">${r.flag} <span style="font-size:10px;color:var(--text3)">${r.risk}%</span></td>
-          </tr>
-        `).join('')}
-      </table>
-    </div>
-  `;
-}
-
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-
-function init() {
-  renderFirmGrid();
-  
-  // Animate bars after render
-  setTimeout(() => {
-    document.querySelectorAll('.ai-bar-fill').forEach(bar => {
-      const w = bar.style.width;
-      bar.style.width = '0%';
-      setTimeout(() => { bar.style.width = w; }, 50);
-    });
-  }, 100);
-}
-
-init();
+renderFirmGrid();
 </script>
 
 </body>
